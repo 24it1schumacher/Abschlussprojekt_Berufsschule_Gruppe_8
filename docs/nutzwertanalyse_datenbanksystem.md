@@ -6,7 +6,7 @@
 
 Verglichen werden PostgreSQL, MariaDB und MySQL. Gesucht ist ein relationales Datenbanksystem für die Maschinenverleih-Anwendung. Der spätere Server ist ein Strato-VPS; die Bereitstellung soll containerisiert und reproduzierbar erfolgen. Die Anwendung muss die Datenbank ausschließlich über eine Datenbank-API ansprechen. Ein ORM oder ein anderes Werkzeug, das die Datenbank bzw. ihr Schema stillschweigend anlegt, ist nicht die vorgesehene Schnittstelle.
 
-Die konkrete Client- und Servertechnologie ist laut [app/README.md](../app/README.md) noch nicht festgelegt. Deshalb bewertet diese Analyse die grundsätzliche Verfügbarkeit üblicher Datenbanktreiber, nicht die Kompatibilität mit einem bereits ausgewählten Framework. Die Punktwerte sind eine begründete Vorbewertung und kein Leistungsvergleich unter Last. Die Entscheidung ist **vorläufig** und muss nach Festlegung des Anwendungs-Stacks im Team bestätigt werden.
+Die Auswahl für die Anwendung ist inzwischen TypeScript im Frontend und Java im Backend; die konkreten Frameworks sind laut [app/README.md](../app/README.md) noch offen. Deshalb bewertet diese Analyse die grundsätzliche Verfügbarkeit üblicher Datenbanktreiber, nicht die Kompatibilität mit einem bereits ausgewählten Framework. Die Punktwerte sind eine begründete Bewertung und kein Leistungsvergleich unter Last. PostgreSQL wurde am 01.10.2026 als Projektauswahl festgelegt; die formelle Teamabstimmung ist im [Decision Board](decision_board.md) als noch zu protokollieren gekennzeichnet.
 
 ## 2. Kriterien und Gewichtung
 
@@ -53,9 +53,9 @@ In jeder Produktspalte steht **Punkte → gewichteter Beitrag**. Die Beiträge s
 
 ## 4. Empfehlung und Einschränkungen
 
-**Vorläufige Empfehlung: PostgreSQL.** PostgreSQL erreicht mit **4,45 von 5 Punkten** den höchsten Nutzwert. Ausschlaggebend ist die in dieser Analyse höher bewertete Eignung für das relationale Modell der Anwendung. Bei Containerbetrieb, Treiberverfügbarkeit, Sicherungsverfahren, Skalierbarkeit sowie Dokumentation und Community ergibt sich aus den vorliegenden Projektinformationen kein belastbarer Unterschied. Kosten sind nicht Teil der Nutzwertberechnung. Der Vorsprung ist daher keine Aussage, PostgreSQL sei technisch in jeder Hinsicht überlegen.
+**Beschlossene Auswahl: PostgreSQL.** PostgreSQL erreicht mit **4,45 von 5 Punkten** den höchsten Nutzwert und wurde am 01.10.2026 als Projektauswahl festgelegt. Ausschlaggebend ist die in dieser Analyse höher bewertete Eignung für das relationale Modell der Anwendung. Bei Containerbetrieb, Treiberverfügbarkeit, Sicherungsverfahren, Skalierbarkeit sowie Dokumentation und Community ergibt sich aus den vorliegenden Projektinformationen kein belastbarer Unterschied. Kosten sind nicht Teil der Nutzwertberechnung. Der Vorsprung ist daher keine Aussage, PostgreSQL sei technisch in jeder Hinsicht überlegen.
 
-Die Empfehlung ist **keine endgültige Teamentscheidung**: User Story 9 verlangt eine Abstimmung im Team. Insbesondere der noch nicht festgelegte Client-Stack kann die Treiber- und Werkzeugauswahl beeinflussen. Auch tatsächlicher Ressourcenbedarf, Datenvolumen und Betriebskenntnisse wurden nicht gemessen. Die Punktwerte sind eine transparente Vorauswahl auf Basis der aktuellen Anforderungen und der verlinkten Herstellerdokumentation, keine unabhängige Leistungsmessung.
+Die Projektauswahl ist dokumentiert; die noch ausstehende formelle Teamabstimmung ist im [Decision Board](decision_board.md) vermerkt, wie von User Story 9 gefordert. Die konkreten Frameworks können die Treiber- und Werkzeugauswahl beeinflussen. Auch tatsächlicher Ressourcenbedarf, Datenvolumen und Betriebskenntnisse wurden nicht gemessen. Die Punktwerte sind eine transparente Auswahlgrundlage auf Basis der aktuellen Anforderungen und der verlinkten Herstellerdokumentation, keine unabhängige Leistungsmessung.
 
 ### Sensitivität: Was könnte die Entscheidung ändern?
 

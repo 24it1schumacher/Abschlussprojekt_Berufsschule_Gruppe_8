@@ -16,23 +16,32 @@ Issue-Beschreibung übernehmen, Labels wie angegeben setzen.
 Die Story-Nummern 1–30 in dieser Datei sind nur die Reihenfolge in diesem Dokument und
 stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Dateiende).
 
-**Sprint-1-Vorschlag (~30 Std./Person):**
-- SI: #2 + #3 + #4 (24h, bereits erledigt/gestartet) + #13 "DB-System auswählen" (8h) = 32h
-- AE: #9 "Grundgerüst" (16h) + #6 "Maschinenstammdaten" (8h) + #25 "Barrierefreiheitsprüfung" (8h) = 32h
+**Qualitätsmaßstab:** Die Stories sind nach INVEST formuliert: unabhängig (bekannte
+Abhängigkeiten stehen ausdrücklich dabei), verhandelbar, wertvoll, schätzbar, klein
+genug für eine umsetzbare Scheibe und anhand der Akzeptanzkriterien testbar. Größere
+Themen sind auf einen klar begrenzten ersten Ausbauschritt reduziert; Erweiterungen
+werden später separat priorisiert.
+
+**Sprint-1-Vorschlag:** Sprintumfang und Auswahl der Stories werden im Kanban-Board
+festgelegt. Die folgenden fachlichen Stories bilden den Projekt-Backlog und sind
+nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
 ## 1. Maschinen nach Verfügbarkeit suchen und reservieren
 
 **Als** Kunde
-**möchte ich** verfügbare Maschinen nach Kategorie, Zeitraum und Standort suchen und direkt reservieren können,
-**damit** ich die passende Maschine für meinen Bedarf buchen kann, ohne vorher Rücksprache mit dem Vermieter halten zu müssen.
+**möchte ich** verfügbare Maschinen nach Kategorie, Zeitraum und Standort suchen und eine passende Maschine reservieren können,
+**damit** ich die Verfügbarkeit prüfen und meine Buchungsanfrage online abschließen kann.
+
+**Voraussetzung:** #9 (Client-Server-Grundgerüst) und #6 (Maschinenstammdaten sind verfügbar)
 
 **Akzeptanzkriterien**
-- [ ] Suchmaske mit Filtern für Kategorie, Verfügbarkeitszeitraum und Standort
-- [ ] Ergebnisliste zeigt ausschließlich Maschinen, die im gewählten Zeitraum tatsächlich frei sind
-- [ ] Reservierung wird verbindlich gespeichert, Kunde erhält eine Bestätigung
-- [ ] Oberfläche ist gemäß ISO 9241 barrierefrei bedienbar
+- [ ] Kunde kann Kategorie, Zeitraum und Standort angeben; unvollständige oder ungültige Zeiträume werden verständlich zurückgewiesen
+- [ ] Ergebnisliste enthält nur Maschinen, die im vollständigen Zeitraum frei sind; bei keinem Treffer wird ein leerer Zustand angezeigt
+- [ ] Für eine ausgewählte Maschine kann der Kunde eine Reservierung absenden und erhält eine Bestätigung mit Maschine und Zeitraum
+- [ ] Zwei gleichzeitig eingereichte, überlappende Reservierungen derselben Maschine können nicht beide bestätigt werden
+- [ ] Die Reservierung ist mit Tastatur bedienbar und Eingabefelder besitzen sichtbare Beschriftungen
 
 **Lernfeld:** LF10a – Benutzerschnittstellen gestalten und entwickeln (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -45,14 +54,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 2. Maschinenstammdaten erfassen und verwalten
 
 **Als** Verleih-Mitarbeiter
-**möchte ich** Maschinenstammdaten (Typ, Baujahr, Betriebsstunden, Wartungsintervalle) anlegen, bearbeiten und aus dem bestehenden Excel-System übernehmen können,
-**damit** alle Maschinendaten zentral, konsistent und als Grundlage für spätere Auswertungen wie die Wartungsplanung verfügbar sind.
+**möchte ich** Maschinenstammdaten (Typ, Baujahr, Betriebsstunden und Wartungsintervall) anlegen, ansehen und bearbeiten können,
+**damit** Mitarbeitende die für den Verleih benötigten Maschinendaten zentral und konsistent pflegen können.
+
+**Voraussetzung:** #9 (Client-Server-Grundgerüst mit Datenbankanbindung)
 
 **Akzeptanzkriterien**
-- [ ] Formular zum Anlegen/Bearbeiten von Maschinendatensätzen mit definierten Pflichtfeldern
-- [ ] Importschnittstelle übernimmt bestehende Excel-Daten fehlerfrei
-- [ ] Validierung verhindert doppelte oder fehlerhafte Einträge
-- [ ] Änderungen werden nachvollziehbar protokolliert (Audit-Trail)
+- [ ] Mitarbeitende können eine Maschine mit Typ, Baujahr, Betriebsstunden und Wartungsintervall anlegen und gespeicherte Werte wieder aufrufen
+- [ ] Pflichtfelder und Wertebereiche sind festgelegt; fehlende oder ungültige Eingaben werden am Feld erklärt und nicht gespeichert
+- [ ] Änderungen an einer Maschine werden nach dem Speichern in der Detailansicht angezeigt
+- [ ] Maschinen mit gleicher eindeutiger Kennung können nicht doppelt angelegt werden
+- [ ] Excel-Import und Audit-Protokoll sind nicht Teil dieses ersten CRUD-Schritts und werden separat geplant
 
 **Lernfeld:** LF5 – Software zur Verwaltung von Daten anpassen
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -65,15 +77,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 3. Wartungsbedarf regelbasiert berechnen und anzeigen
 
 **Als** Werkstattplaner
-**möchte ich** dass das System anhand einfacher, nachvollziehbarer Regeln (z. B. Schwellenwerte für Betriebsstunden und Zeit seit letzter Wartung) den Wartungsbedarf je Maschine berechnet und anzeigt,
-**damit** ich Wartungen rechtzeitig einplanen kann, auch ohne ein Machine-Learning-Modell aufzubauen.
+**möchte ich** für jede Maschine einen nachvollziehbaren Wartungsstatus anhand des Betriebsstunden- und Zeitintervalls sehen,
+**damit** ich fällige Wartungen frühzeitig einplanen kann.
+
+**Voraussetzung:** #6 (Maschinenstammdaten mit Betriebsstunden und Wartungsintervallen)
 
 **Akzeptanzkriterien**
-- [ ] Für jede Maschine wird aus Betriebsstunden, Wartungsintervall und letztem Wartungstermin ein Status (z. B. „ok“/„bald fällig“/„überfällig“) berechnet
-- [ ] Die Regeln (Schwellenwerte) sind konfigurierbar und dokumentiert, nicht hart codiert
-- [ ] Maschinen mit „bald fällig“ oder „überfällig“ werden in einer Übersicht hervorgehoben
-- [ ] Die Berechnungslogik ist nachvollziehbar dokumentiert (kein Black-Box-Modell)
-- [ ] Status lässt sich exportieren bzw. an die Werkstattplanung übergeben
+- [ ] Für eine Maschine mit vollständig gepflegten Wartungsdaten wird der Status „in Ordnung“, „bald fällig“ oder „überfällig“ angezeigt
+- [ ] Grenzwerte für „bald fällig“ sind dokumentiert und an einer zentralen Stelle änderbar
+- [ ] Fehlende Wartungsdaten werden als „nicht bestimmbar“ angezeigt und nicht fälschlich als „in Ordnung“ gewertet
+- [ ] Die Statusberechnung ist durch Tests für alle drei Status und fehlende Werte abgedeckt
+- [ ] Export und Übergabe an externe Werkstattplanung sind nicht Teil dieses ersten Ausbauschritts
 
 **Lernfeld:** LF11a – Funktionalität in Anwendungen realisieren (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -86,14 +100,15 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 4. Infrastruktur automatisiert bereitstellen (Infrastructure-as-Code)
 
 **Als** Entwicklerteam
-**möchte ich** die Basisinfrastruktur (Container-Technologie und Reverse Proxy) per Infrastructure-as-Code/Configuration-as-Code automatisiert aufsetzen können,
-**damit** die gesamte Umgebung jederzeit reproduzierbar zerstört und neu aufgebaut werden kann, statt alles manuell zu konfigurieren.
+**möchte ich** einen Platzhalterdienst und einen Reverse Proxy mit versionierter Konfiguration reproduzierbar bereitstellen können,
+**damit** das Team eine wiederholbare Grundlage für die späteren Anwendungsdienste hat.
 
 **Akzeptanzkriterien**
-- [ ] Ein Skript/Playbook (z. B. Ansible, Docker Compose) richtet Container-Laufzeit und Reverse Proxy vollautomatisch ein
-- [ ] Die gesamte Konfiguration liegt versioniert im Git-Repository
-- [ ] Nach vollständigem Löschen der Umgebung stellt ein einzelner Befehl sie wieder her
-- [ ] Der Reverse Proxy leitet eine Testanfrage per HTTPS mit gültigem Zertifikat an einen Platzhalterdienst weiter
+- [ ] Ein dokumentierter IaC-/Configuration-as-Code-Aufruf startet den Platzhalterdienst und den Reverse Proxy auf der Zielumgebung
+- [ ] Nach einem Stoppen und erneuten Start mit leerer Laufzeitumgebung stehen beide Dienste mit derselben versionierten Konfiguration wieder bereit
+- [ ] Eine externe Testanfrage erreicht über den Reverse Proxy den Platzhalterdienst und erhält die erwartete Antwort
+- [ ] Verwendete Ports und erforderliche Konfigurationswerte sind dokumentiert; Geheimnisse liegen nicht im Repository
+- [ ] Automatische Zertifikatsbeschaffung wird separat in #18 umgesetzt
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -106,17 +121,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 5. Lauffähiges Client-Server-Grundgerüst mit Datenbankanbindung aufsetzen
 
 **Als** Entwicklerteam
-**möchte ich** ein minimales, lauffähiges Grundgerüst aus Client, Server und Datenbank (angebunden über eine Datenbank-API) aufsetzen,
-**damit** wir ab sofort an einzelnen fachlichen Funktionen (z. B. Maschinen- oder Kundenverwaltung) weiterarbeiten können, ohne die Basisarchitektur jedes Mal neu zu bauen.
+**möchte ich** einen kleinen Client mit einem objektorientierten Server und einem Datenbankzugriff über eine explizite Datenbank-API verbinden,
+**damit** wir eine getestete technische Grundlage für weitere fachliche Funktionen haben.
 
-**Voraussetzung:** #8 (Reverse Proxy ist eingerichtet)
+**Voraussetzung:** #8 (Reverse Proxy ist eingerichtet) und #13 (Datenbanksystem ist im Team ausgewählt)
 
 **Akzeptanzkriterien**
-- [ ] Die objektorientierte Server-Anwendung ist über den Reverse Proxy erreichbar
-- [ ] Die Datenbankanbindung erfolgt ausschließlich über eine Datenbank-API (kein Tool, das die DB implizit erzeugt)
-- [ ] Ein einfacher Testendpunkt schreibt/liest einen Beispieldatensatz in/aus der Datenbank
-- [ ] Der Client kann sich mit dem Server verbinden und den Testendpunkt erfolgreich aufrufen
-- [ ] Die Grundarchitektur ist als UML-Diagramm (z. B. Deployment- oder Komponentendiagramm) dokumentiert
+- [ ] Der Server ist über die vereinbarte Route des Reverse Proxys erreichbar und liefert auf eine dokumentierte Testanfrage eine erfolgreiche Antwort
+- [ ] Ein Testendpunkt speichert und liest einen Beispieldatensatz über den vorgesehenen Datenbanktreiber bzw. das Datenbankprotokoll
+- [ ] Der Client ruft den Testendpunkt auf und zeigt den gelesenen Beispielwert an
+- [ ] Datenbank und Schema werden nicht von ORM, Framework oder anderem Tool implizit erzeugt; Einrichtung und Schemaänderung sind explizit nachvollziehbar
+- [ ] Eine einfache Komponenten- oder Deployment-Übersicht zeigt Client, Server, Datenbank-API und Datenbank
 
 **Lernfeld:** LF5 – Software zur Verwaltung von Daten anpassen
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -129,14 +144,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 6. Kundenstammdaten aus dem Altsystem übernehmen
 
 **Als** Verleih-Mitarbeiter
-**möchte ich** die bestehenden Kundendaten aus dem alten Excel-System über eine programmierte Schnittstelle in die neue Anwendung übernehmen und dort pflegen können,
-**damit** kein Kunde beim Umstieg verloren geht und alle Kundendaten zentral im neuen System verfügbar sind.
+**möchte ich** einen bereitgestellten Excel-Export mit Kundendaten wiederholbar in das neue System importieren können,
+**damit** Kundendaten beim Umstieg vollständig und ohne unbeabsichtigte Duplikate übernommen werden.
+
+**Voraussetzung:** #9 (Client-Server-Grundgerüst mit Datenbankanbindung)
 
 **Akzeptanzkriterien**
-- [ ] Importschnittstelle liest die Excel-Kundendaten ein und ordnet sie den Feldern des neuen Datenmodells zu
-- [ ] Fehlerhafte oder unvollständige Datensätze werden beim Import erkannt und protokolliert statt stillschweigend übernommen
-- [ ] Kundendaten lassen sich im neuen System anschließend anlegen, ändern und suchen
-- [ ] Import ist wiederholbar, ohne Duplikate zu erzeugen
+- [ ] Ein festgelegtes Excel-Dateiformat wird eingelesen und auf die dokumentierten Kundenfelder abgebildet
+- [ ] Vor dem Import wird eine Zusammenfassung mit Anzahl gültiger und fehlerhafter Zeilen angezeigt
+- [ ] Ungültige Zeilen werden mit Zeilennummer und Fehlergrund ausgewiesen und nicht stillschweigend importiert
+- [ ] Erneuter Import derselben Datei erzeugt keine doppelten Kunden
+- [ ] Manuelles Anlegen und Bearbeiten von Kunden ist nicht Teil dieser Importscheibe
 
 **Lernfeld:** LF8 – Daten systemübergreifend bereitstellen
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -149,14 +167,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 7. Rollen- und Zugriffsrechte verwalten
 
 **Als** Systemverantwortlicher
-**möchte ich** Benutzerkonten mit unterschiedlichen Rollen (z. B. Kunde, Mitarbeiter, Admin) und passenden Zugriffsrechten anlegen können,
-**damit** jede Nutzergruppe nur auf die für sie vorgesehenen Daten und Funktionen zugreifen kann und die Anforderungen an Zugriffskontrollen gemäß GoBD erfüllt werden.
+**möchte ich** mich anmelden und nur Funktionen aufrufen können, die meiner zugewiesenen Rolle erlaubt sind,
+**damit** geschützte Kunden- und Verwaltungsfunktionen nicht von unberechtigten Personen verwendet werden können.
+
+**Voraussetzung:** #9 (Server-Grundgerüst mit Datenbankanbindung)
 
 **Akzeptanzkriterien**
-- [ ] Anmeldung erfordert gültige Zugangsdaten, Passwörter werden sicher gespeichert (Hashing)
-- [ ] Jede Rolle hat klar definierte Rechte (z. B. Kunde sieht nur eigene Buchungen, Mitarbeiter sieht alle)
-- [ ] Unautorisierte Zugriffsversuche auf fremde Daten werden abgelehnt und protokolliert
-- [ ] Rollenzuordnung ist im System änderbar, ohne Code anzupassen
+- [ ] Ein Nutzer kann sich mit gültigen Zugangsdaten anmelden; ungültige Zugangsdaten führen zu einer neutralen Fehlermeldung
+- [ ] Passwörter werden ausschließlich mit einem geeigneten Passwort-Hashverfahren gespeichert, niemals im Klartext
+- [ ] Mindestens die Rollen „Kunde“ und „Mitarbeiter“ sind definiert; ein nicht angemeldeter Nutzer erhält keinen Zugriff auf geschützte Funktionen
+- [ ] Ein Kunde kann über die API nur eigene Beispieldaten abrufen; der Versuch, eine fremde Kunden-ID anzufordern, wird abgewiesen
+- [ ] Rollen- und Berechtigungsregeln sind dokumentiert und durch automatisierte Tests abgedeckt
 
 **Lernfeld:** LF11a – Funktionalität in Anwendungen realisieren (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -169,37 +190,39 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 8. Buchung zu einem verbindlichen Auftrag mit Audit-Trail machen
 
 **Als** Kunde
-**möchte ich** dass meine Reservierung nach Bestätigung zu einem verbindlichen Auftrag mit eindeutiger Auftragsnummer wird, dessen Entstehung nachvollziehbar dokumentiert ist,
-**damit** ich einen verlässlichen Nachweis über meine Buchung habe und der Verleiher die Anforderungen an compliance-konforme Datenerfassung erfüllt.
+**möchte ich** eine bestätigte Reservierung als Auftrag mit eindeutiger Nummer wiederfinden können,
+**damit** sowohl der Kunde als auch der Verleiher einen eindeutigen Nachweis über die Buchung haben.
 
 **Voraussetzung:** #5 (Reservierung kann angelegt werden)
 
 **Akzeptanzkriterien**
-- [ ] Aus einer bestätigten Reservierung wird automatisch ein Auftrag mit eindeutiger Nummer, Kunde, Maschine und Zeitraum erzeugt
-- [ ] Jede Statusänderung des Auftrags (angelegt, geändert, storniert) wird unveränderbar im Audit-Log protokolliert (Zeitstempel, Nutzer, Aktion)
-- [ ] Der Auftrag ist Grundlage für die spätere Rechnungsstellung und kann nicht rückwirkend manipuliert werden
-- [ ] Kunde und Mitarbeiter können den aktuellen Auftragsstatus jederzeit einsehen
+- [ ] Für eine bestätigte Reservierung wird genau ein Auftrag mit eindeutiger Nummer sowie Kunde, Maschine und Zeitraum erzeugt
+- [ ] Bei fehlender oder bereits verarbeiteter Reservierung wird kein doppelter Auftrag angelegt und ein verständlicher Fehler zurückgegeben
+- [ ] Kunde und berechtigter Mitarbeiter können Nummer und aktuellen Status des Auftrags abrufen
+- [ ] Erzeugung und Statusänderung werden mit Zeitpunkt, Nutzer und Aktion protokolliert; das Protokoll ist über die Anwendung nicht änderbar
+- [ ] Rechnungsstellung und Korrekturverfahren sind nicht Teil dieser ersten Auftragsscheibe
 
 **Lernfeld:** LF12a – Kundenspezifische Anwendungsentwicklung durchführen (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Gestaltung von IT-Dienstleistungen
-**Aufwand (T-Shirt-Größe):** XL (mehr als 16 Std.)
+**Aufwand (T-Shirt-Größe):** L (16 Std.)
 
-**Labels:** `user-story`, `lernfeld-LF12a`, `fachrichtung-AE`, `size-XL`
+**Labels:** `user-story`, `lernfeld-LF12a`, `fachrichtung-AE`, `size-L`
 
 ---
 
 ## 9. Datenbanksystem kriteriengeleitet auswählen
 
 **Als** Systemadministrator
-**möchte ich** anhand fachlicher und wirtschaftlicher Kriterien ein konkretes Datenbanksystem auswählen,
-**damit** eine begründete, dokumentierte Entscheidung vorliegt, bevor die Datenbank produktiv aufgesetzt wird, und die Datenbank-API-Anforderung aus den Rahmenbedingungen eingehalten wird.
+**möchte ich** anhand vorher festgelegter, zum Schulprojekt passender Kriterien ein Datenbanksystem auswählen,
+**damit** die technische Grundlage vor der Bereitstellung begründet und im Team nachvollziehbar beschlossen ist.
 
 **Akzeptanzkriterien**
-- [ ] Mindestens drei relevante Datenbanksysteme sind recherchiert und gegenübergestellt
-- [ ] Bewertungskriterien sind vorab festgelegt (z. B. Lizenzkosten, Skalierbarkeit, Backup-Funktionen, Kompatibilität mit der Client-Technologie, Community/Support)
-- [ ] Entscheidung liegt als dokumentierte Nutzwertanalyse mit Punktebewertung vor
-- [ ] Ausgewähltes System ist ausschließlich über eine Datenbank-API ansprechbar (kein Tool, das die Datenbank implizit erzeugt)
-- [ ] Entscheidung ist im Team abgestimmt und dokumentiert (z. B. als Architecture Decision Record)
+- [ ] Mindestens PostgreSQL, MariaDB und MySQL werden mit vorab festgelegten Kriterien verglichen; Kriterien und Gewichte ergeben zusammen 100 %
+- [ ] Lizenz- und Anschaffungskosten fließen nicht in die Bewertung ein, da für Datenbanksoftware kein Budget vorgesehen ist
+- [ ] Für jedes Kriterium sind Skala, Punkte und gewichteter Beitrag nachvollziehbar dargestellt; die Summen sind rechnerisch korrekt
+- [ ] Die Analyse enthält eine Empfehlung, Einschränkungen und Faktoren, die das Ergebnis ändern könnten
+- [ ] Das Team bestätigt die Auswahl und hält sie in der Analyse oder einem Architecture Decision Record fest
+- [ ] Die Anwendung greift später ausschließlich über eine Datenbank-API auf das ausgewählte System zu; ein Werkzeug darf Datenbank oder Schema nicht ungefragt erzeugen
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -212,17 +235,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 10. Datenbank-Server produktiv bereitstellen
 
 **Als** Systemadministrator
-**möchte ich** das ausgewählte Datenbanksystem automatisiert auf dem Strato-Server einrichten,
-**damit** die Anwendung eine stabile, gesicherte und reproduzierbare Datenbasis nutzen kann.
+**möchte ich** den ausgewählten Datenbankserver versioniert und reproduzierbar auf dem Strato-VPS betreiben,
+**damit** die Anwendung eine erreichbare Datenbank mit kontrolliertem Zugriff verwenden kann.
 
-**Voraussetzung:** #13 (Datenbanksystem ist ausgewählt)
+**Voraussetzung:** #13 (Datenbanksystem ist ausgewählt) und #9 (Anwendung kann Datenbankzugriffe testen)
 
 **Akzeptanzkriterien**
-- [ ] Datenbank läuft containerisiert und ist per IaC-Skript reproduzierbar aufsetzbar
-- [ ] Zugriff ist auf notwendige Netzwerkports/-quellen beschränkt
-- [ ] Zugangsdaten sind sicher hinterlegt (kein Klartext-Passwort im Repository)
-- [ ] Regelmäßige automatisierte Backups sind eingerichtet und ein Restore wurde erfolgreich getestet
-- [ ] Die Anwendung aus dem Grundgerüst kann sich erfolgreich verbinden
+- [ ] Eine festgelegte Version des ausgewählten Datenbanksystems startet mit einem dokumentierten IaC-/Container-Aufruf und verwendet persistenten Speicher
+- [ ] Der Datenbankport ist nur für die Anwendungsdienste bzw. ausdrücklich freigegebene Quellen erreichbar
+- [ ] Zugangsdaten werden außerhalb des Repositorys bereitgestellt; ein Start ohne erforderliche Zugangsdaten schlägt sichtbar fehl
+- [ ] Der Anwendungsserver aus #9 kann über seinen Datenbanktreiber eine Verbindung herstellen und eine Testabfrage ausführen
+- [ ] Das Datenbankschema wird nicht durch den Containerstart oder ein ORM ungefragt erzeugt; Schemaeinrichtung ist als expliziter Schritt dokumentiert
+- [ ] Backup und Restore werden in #26 behandelt und sind keine Voraussetzung für diese erste Bereitstellungsscheibe
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -235,15 +259,15 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 11. Mailserver-System kriteriengeleitet auswählen
 
 **Als** Systemadministrator
-**möchte ich** aus den vorgegebenen Optionen (Mailcow, docker-mailserver, stalwart) anhand festgelegter Kriterien ein Mailserver-System auswählen,
-**damit** eine begründete Entscheidung als Grundlage für Buchungsbestätigungen und den späteren Rechnungsversand vorliegt.
+**möchte ich** Mailcow, docker-mailserver und Stalwart anhand vorher festgelegter Projektkriterien vergleichen,
+**damit** das Team eine nachvollziehbare Grundlage für den späteren E-Mail-Versand erhält.
 
 **Akzeptanzkriterien**
-- [ ] Alle drei vorgegebenen Mailserver-Lösungen sind hinsichtlich Wartungsaufwand, Ressourcenbedarf, Funktionsumfang (z. B. DKIM/SPF, Webmail, API) und Docker-Kompatibilität verglichen
-- [ ] Bewertungskriterien und Gewichtung sind vor der Bewertung festgelegt
-- [ ] Entscheidung liegt als dokumentierte Nutzwertanalyse vor
-- [ ] Gewähltes System ist mit der bestehenden Container- und Reverse-Proxy-Architektur kompatibel
-- [ ] Entscheidung ist im Team abgestimmt und dokumentiert
+- [ ] Alle drei vorgegebenen Systeme werden mit denselben, vorab festgelegten Kriterien verglichen; Gewichte ergeben 100 %
+- [ ] Punkte und gewichtete Beiträge sind auf einer einheitlichen Skala angegeben und die Gesamtsummen sind nachgerechnet
+- [ ] Ressourcenbedarf wird mit der tatsächlich verfügbaren VPS-Konfiguration abgeglichen
+- [ ] Die Nutzwertanalyse benennt Empfehlung, wesentliche Risiken und mögliche Gründe für eine andere Wahl
+- [ ] Das Team bestätigt die Auswahl; die Container- und Reverse-Proxy-Kompatibilität wird vor der Bereitstellung konkret geprüft
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -256,17 +280,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 12. Mailserver produktiv bereitstellen
 
 **Als** Systemadministrator
-**möchte ich** das ausgewählte Mailserver-System (z. B. Mailcow, docker-mailserver oder stalwart) automatisiert auf dem Strato-Server einrichten,
-**damit** die Anwendung Buchungsbestätigungen und spätere Rechnungen zuverlässig und sicher per E-Mail versenden kann.
+**möchte ich** mit dem ausgewählten Mailserver aus der Anwendung eine Test-E-Mail sicher versenden können,
+**damit** die technische Verbindung für spätere Buchungsbestätigungen nachgewiesen ist.
 
-**Voraussetzung:** #15 (Mailserver-System ist ausgewählt)
+**Voraussetzung:** #15 (Mailserver-System ist ausgewählt) und #8 (Container-/Proxy-Umgebung ist verfügbar)
 
 **Akzeptanzkriterien**
-- [ ] Mailserver läuft containerisiert und ist per IaC-Skript reproduzierbar aufsetzbar
-- [ ] SPF-, DKIM- und DMARC-Einträge sind korrekt konfiguriert, Testmails landen nicht im Spam
-- [ ] Zugangsdaten und Postfächer sind sicher angelegt (kein Klartext-Passwort im Repository)
-- [ ] Die Anwendung kann über die Mailserver-Schnittstelle erfolgreich eine Test-E-Mail versenden
-- [ ] Backups der Mailserver-Konfiguration und -Daten sind eingerichtet und ein Restore wurde getestet
+- [ ] Der ausgewählte Mailserver startet mit versionierter Konfiguration reproduzierbar auf der Zielumgebung
+- [ ] Zugangsdaten werden außerhalb des Repositorys verwaltet und sind nicht in Logs oder Antworten sichtbar
+- [ ] Ein dokumentierter Test-Endpunkt oder Testlauf sendet genau eine Nachricht an eine festgelegte Testadresse und meldet Erfolg oder Fehler nachvollziehbar
+- [ ] SPF-, DKIM- und DMARC-Einträge werden dokumentiert; Zustellbarkeit wird mit einer Testnachricht geprüft
+- [ ] Backup und Wiederherstellung von Maildaten werden in #26 behandelt und sind nicht Teil dieses ersten Versandtests
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -276,20 +300,20 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 13. Betrieb und Sicherheit der vernetzten Systeme gewährleisten
+## 13. Verfügbarkeit von Datenbank- und Mailserver überwachen
 
 **Als** Systemadministrator
-**möchte ich** Datenbank- und Mailserver kontinuierlich überwachen, härten und mit Sicherheitsupdates versorgen,
-**damit** ein stabiler, sicherer Dauerbetrieb der Backend-Systeme gewährleistet ist und Ausfälle oder Sicherheitsvorfälle frühzeitig erkannt werden.
+**möchte ich** den Zustand von Datenbank- und Mailserver anhand weniger festgelegter Prüfwerte überwachen,
+**damit** ein Ausfall oder eine kritische Ressourcensituation zeitnah erkannt wird.
 
 **Voraussetzung:** #14 und #16 (Datenbank- und Mailserver sind produktiv im Einsatz)
 
 **Akzeptanzkriterien**
-- [ ] Monitoring erfasst Verfügbarkeit, Ressourcenauslastung und Fehlerzustände von DB- und Mailserver
-- [ ] Bei kritischen Zuständen (z. B. Dienst nicht erreichbar, Speicher voll) wird automatisch eine Benachrichtigung ausgelöst
-- [ ] Sicherheitsupdates werden regelmäßig geprüft und dokumentiert eingespielt
-- [ ] Ein einfacher Incident-Response-Ablauf (Was tun bei Ausfall/Angriff?) ist dokumentiert
-- [ ] Zugriffslogs beider Dienste werden revisionssicher aufbewahrt
+- [ ] Für Datenbank und Mailserver werden Erreichbarkeit und Speicherbelegung mit Zeitstempel erfasst
+- [ ] Ein definierter Grenzwert für Nichterreichbarkeit und für kritische Speicherbelegung löst jeweils eine sichtbare Benachrichtigung aus
+- [ ] Das Dashboard zeigt den letzten Prüfzeitpunkt und den aktuellen Zustand beider Dienste
+- [ ] Ein kurzer Ablauf für „Dienst nicht erreichbar“ nennt Zuständigkeit und erste Prüfschritte
+- [ ] Serverhärtung und Update-Management werden in #3, zentrales Log-Management in #30 behandelt
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -302,17 +326,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 14. TLS-Verschlüsselung automatisiert verwalten
 
 **Als** Systemadministrator
-**möchte ich** dass der Reverse Proxy TLS-Zertifikate automatisiert bezieht und erneuert,
-**damit** alle Verbindungen zu Webportal, Online-Shop und Mailserver durchgehend verschlüsselt sind, ohne dass Zertifikate manuell nachgepflegt werden müssen.
+**möchte ich** TLS-Zertifikate für die tatsächlich eingerichteten Web-Subdomains automatisch beziehen und erneuern lassen,
+**damit** der Browser die Webanwendung über HTTPS mit einem gültigen Zertifikat erreicht.
 
 **Voraussetzung:** #8 (Reverse Proxy ist eingerichtet)
 
 **Akzeptanzkriterien**
-- [ ] Reverse Proxy bezieht Zertifikate automatisiert (z. B. via Let's Encrypt) für alle relevanten Subdomains
-- [ ] Erneuerung erfolgt automatisch vor Ablauf, ohne Downtime der Dienste
-- [ ] Unverschlüsselte Verbindungen (HTTP) werden automatisch auf HTTPS umgeleitet
-- [ ] Zertifikatskonfiguration ist Bestandteil des IaC-Setups und versioniert im Repository
-- [ ] Ein Test mit einem SSL-Prüfwerkzeug bestätigt eine sichere Konfiguration (kein veraltetes TLS/keine schwachen Ciphers)
+- [ ] Für jede im Sprint eingerichtete Web-Subdomain stellt der Reverse Proxy automatisiert ein gültiges Zertifikat bereit
+- [ ] Eine Anfrage über HTTP wird auf dieselbe Adresse unter HTTPS umgeleitet
+- [ ] Zertifikatsablauf und automatische Erneuerung sind über den Status des Proxy bzw. einen Erneuerungstest nachvollziehbar
+- [ ] Proxy-Konfiguration ist versioniert; private Schlüssel oder Zugangsdaten sind nicht eingecheckt
+- [ ] Ein TLS-Prüfwerkzeug bestätigt ein gültiges Zertifikat und eine erfolgreiche HTTPS-Verbindung
+- [ ] Mail-Protokolle und noch nicht bereitgestellte Shop-Subdomains sind nicht Teil dieser Web-TLS-Scheibe
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -325,17 +350,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 15. Persönliche Benutzerkonten mit SSH-Key einrichten
 
 **Als** Systemadministrator
-**möchte ich** für jedes Teammitglied ein persönliches Benutzerkonto mit eigenem RSA-Schlüssel auf dem VPS anlegen,
-**damit** niemand mehr als root arbeitet und jede Aktion einer Person zugeordnet werden kann.
+**möchte ich** für die Teammitglieder getrennte Serverkonten mit jeweils eigenem SSH-Schlüssel einrichten,
+**damit** administrative und Entwicklungszugriffe Personen zugeordnet und auf das notwendige Maß begrenzt werden können.
 
 **Akzeptanzkriterien**
-- [ ] Konten für Systemintegration und Anwendungsentwicklung sind angelegt; das Verfahren für weitere Konten ist dokumentiert
-- [ ] Jedes Konto meldet sich mit einem eigenen RSA-Schlüssel (mindestens 3072 Bit) an; auf dem Server liegen nur die öffentlichen Schlüssel (Rechte `700` für `.ssh`, `600` für `authorized_keys`)
-- [ ] Das SI-Konto hat volle sudo-Rechte (mit Passwort); das AE-Konto startet ohne sudo-Rechte und nutzt Docker rootless (siehe #4)
-- [ ] Zusätzliche sudo-Freigaben für das AE-Konto werden bei Bedarf im Team abgestimmt, einzeln und ohne Wildcards unter `/etc/sudoers.d/` eingetragen (mit `visudo -c` geprüft) und begründet dokumentiert
-- [ ] Die Anmeldung mit allen neuen Konten ist erfolgreich getestet
-- [ ] Eine kurze Anleitung zur SSH-Anmeldung mit Schlüssel liegt für neue Teammitglieder vor
-- [ ] Die Benutzeranlage liegt als Skript versioniert im Git-Repository (nur öffentliche Schlüssel, keine Passwörter)
+- [ ] Für SI und AE existiert je ein benanntes persönliches Konto; das Verfahren für ein weiteres Konto ist dokumentiert
+- [ ] Jedes Konto akzeptiert seinen eigenen Schlüssel mit mindestens 3072 Bit; auf dem Server liegt nur der öffentliche Schlüssel und die Verzeichnisrechte sind `700`/`600`
+- [ ] SI kann administrative Aufgaben über sudo mit Passwort ausführen; AE ist nicht Mitglied der sudo- oder Docker-Gruppe
+- [ ] Ein Login-Test mit jedem Konto ist erfolgreich und der verwendete Benutzer ist auf dem Server eindeutig feststellbar
+- [ ] Die SSH-Kurzanleitung nennt Erzeugung, sichere Weitergabe des öffentlichen Schlüssels und Login-Test
+- [ ] Einrichtungsskript bzw. Ablauf enthält keine privaten Schlüssel, Passwörter oder sonstigen Geheimnisse
+- [ ] Rootless Docker und zusätzliche AE-Sudo-Freigaben sind nicht Teil dieser Konten-Story und werden separat umgesetzt
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -348,18 +373,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 16. Server nach IT-Grundschutz härten
 
 **Als** Systemadministrator
-**möchte ich** den öffentlich erreichbaren VPS nach den Basismaßnahmen des IT-Grundschutz härten,
-**damit** ab dem ersten Tag eine sichere Grundlage für alle weiteren Komponenten besteht.
+**möchte ich** die SSH- und Netzwerkzugänge des öffentlich erreichbaren VPS mit den festgelegten Grundmaßnahmen absichern,
+**damit** der Server nur über notwendige und nachvollziehbare Zugänge erreichbar ist.
 
 **Voraussetzung:** #2 ist abgeschlossen (Anmeldung mit persönlichen Konten funktioniert)
 
 **Akzeptanzkriterien**
-- [ ] SSH-Anmeldung als root und per Passwort ist deaktiviert; die wirksame Konfiguration ist mit `sshd -T` geprüft
-- [ ] Die Firewall lässt ausschließlich benötigte Ports zu
-- [ ] Ein Schutz gegen Brute-Force-Angriffe (z. B. fail2ban) ist aktiv
-- [ ] Automatische Sicherheitsupdates sind eingerichtet
-- [ ] Eine Schutzbedarfsanalyse (Vertraulichkeit, Integrität, Verfügbarkeit) ist dokumentiert und die Maßnahmen sind den Bausteinen SYS.1.1 und SYS.1.3 zugeordnet
-- [ ] Die Härtung liegt als Skript versioniert im Git-Repository und ist reproduzierbar ausführbar
+- [ ] Nach erfolgreichem Test eines sudo-Kontos aus #2 ist Root-SSH-Login gesperrt; `sshd -T` bestätigt die wirksame Einstellung
+- [ ] SSH-Passwortanmeldung ist deaktiviert und ein Test bestätigt, dass nur vorgesehene Schlüsselkonten zugelassen werden
+- [ ] Firewall-Regeln erlauben nur dokumentierte notwendige Ports; ein Test von außen bestätigt einen nicht benötigten Port als geschlossen
+- [ ] Brute-Force-Schutz und automatische Sicherheitsupdates sind aktiv und ihr Status ist dokumentiert
+- [ ] Eine kurze Schutzbedarfsbetrachtung ordnet die Maßnahmen den Grundschutz-Bausteinen SYS.1.1 und SYS.1.3 zu
+- [ ] Konfiguration oder Skript ist versioniert und wiederholt ausführbar; ein erneuter Lauf erzeugt keinen Konfigurationsfehler
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -372,17 +397,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 17. Rootless Docker für das Entwicklerkonto einrichten
 
 **Als** Anwendungsentwickler
-**möchte ich** mit meinem eigenen Konto Container ohne root-Rechte starten können,
-**damit** ich selbstständig arbeiten kann, ohne Root-Zugriff auf den Server zu erhalten.
+**möchte ich** Container mit meinem Entwicklerkonto im Rootless-Modus starten und stoppen können,
+**damit** ich Entwicklungsdienste betreiben kann, ohne Mitglied der privilegierten Docker-Gruppe zu sein.
 
 **Voraussetzung:** #8 (Docker installiert) und #2 (AE-Konto vorhanden)
 
 **Akzeptanzkriterien**
-- [ ] Rootless Docker ist für das AE-Konto eingerichtet (Einträge in `/etc/subuid` und `/etc/subgid` vorhanden, Setup über `dockerd-rootless-setuptool.sh`)
-- [ ] Der Docker-Dienst des Kontos läuft als systemd-User-Dienst und startet auch ohne aktive Anmeldung (`loginctl enable-linger`)
-- [ ] `docker info` zeigt `rootless` unter den Security Options; das Konto ist nicht Mitglied der Gruppe `docker`
-- [ ] Die unter Ubuntu 24.04 aktive AppArmor-Beschränkung für unprivilegierte User-Namespaces ist per AppArmor-Profil für rootlesskit gelöst
-- [ ] Die Einrichtung liegt als Skript versioniert im Git-Repository
+- [ ] Das AE-Konto hat gültige Subordinate UID/GID-Bereiche und der Rootless-Docker-Dienst startet ohne Root-Daemon
+- [ ] `docker info` weist Rootless als Sicherheitsoption aus und das AE-Konto ist nicht Mitglied der Gruppe `docker`
+- [ ] Ein Testcontainer kann ohne sudo gestartet, abgefragt und wieder entfernt werden
+- [ ] Nach Abmeldung bleibt der User-Dienst gemäß vereinbarter Konfiguration erreichbar bzw. startet erneut
+- [ ] Falls AppArmor die User-Namespaces blockiert, ist die dokumentierte Profilregel aktiv und ein Testcontainer startet erfolgreich
+- [ ] Einrichtungsschritte sind versioniert; Zugangsdaten oder private Schlüssel sind nicht enthalten
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -395,15 +421,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 18. Reservierung stornieren oder ändern
 
 **Als** Kunde
-**möchte ich** eine bestehende Reservierung innerhalb einer angemessenen Frist selbst stornieren oder auf einen anderen Zeitraum ändern können,
-**damit** ich flexibel auf Planänderungen reagieren kann, ohne den Verleih-Mitarbeiter anrufen zu müssen.
+**möchte ich** eine eigene aktive Reservierung vor der festgelegten Frist stornieren oder deren Zeitraum ändern können,
+**damit** ich Planänderungen selbstständig verwalten kann.
+
+**Voraussetzung:** #5 (Reservierung ist möglich) und #11 (Kundenanmeldung und Zugriffsschutz)
 
 **Akzeptanzkriterien**
-- [ ] Kunde sieht in seinem Bereich alle eigenen aktiven Reservierungen
-- [ ] Stornierung ist bis zu einer konfigurierbaren Frist vor Mietbeginn möglich, danach nicht mehr über Selfservice
-- [ ] Änderung des Zeitraums prüft erneut die Verfügbarkeit der Maschine
-- [ ] Stornierung/Änderung wird im Auftrags-/Audit-Verlauf nachvollziehbar protokolliert
-- [ ] Kunde erhält eine Bestätigung der Stornierung/Änderung
+- [ ] Ein angemeldeter Kunde sieht seine aktiven Reservierungen mit Maschine, Zeitraum und Status, aber keine fremden Reservierungen
+- [ ] Stornierung ist bis zu einer dokumentierten Frist möglich; nach Fristablauf wird die Aktion abgewiesen und erklärt
+- [ ] Bei einer Zeitraumänderung wird die Maschinenverfügbarkeit erneut geprüft; bei Konflikt bleibt die alte Reservierung unverändert
+- [ ] Eine erfolgreiche Änderung oder Stornierung aktualisiert Status und Zeitstempel nachvollziehbar
+- [ ] Der Kunde erhält nach erfolgreicher Änderung oder Stornierung eine sichtbare Bestätigung
 
 **Lernfeld:** LF10a – Benutzerschnittstellen gestalten und entwickeln (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -416,40 +444,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 19. Rechnung aus Auftrag erzeugen, UStG/GoBD-konform
 
 **Als** Verleih-Mitarbeiter
-**möchte ich** dass aus einem abgeschlossenen Auftrag automatisch eine formal korrekte Rechnung mit allen Pflichtangaben nach UStG erzeugt wird,
-**damit** die Abrechnung rechtssicher, nachvollziehbar und GoBD-konform erfolgt und nicht mehr manuell in Excel gepflegt werden muss.
+**möchte ich** aus einem abgeschlossenen Auftrag einen unveränderbaren Rechnungsentwurf mit den projektrelevanten Pflichtangaben erzeugen können,
+**damit** Mitarbeitende den Abrechnungsdatensatz nachvollziehbar prüfen und als PDF bereitstellen können.
 
 **Voraussetzung:** #12 (Auftrag mit Audit-Trail existiert)
 
 **Akzeptanzkriterien**
-- [ ] Rechnung enthält alle Pflichtangaben nach § 14 UStG (fortlaufende Rechnungsnummer, Steuernummer/USt-ID, Leistungszeitraum, Steuersatz/-betrag, Rechnungs- und Leistungsdatum)
-- [ ] Rechnungsnummern werden lückenlos und fortlaufend vergeben
-- [ ] Einmal erzeugte Rechnungen sind unveränderbar (Korrekturen nur per Storno-/Korrekturrechnung)
-- [ ] Rechnung wird als PDF erzeugt und ist archivierbar (GoBD-konforme, unveränderbare Ablage)
-- [ ] Erzeugung und jede Statusänderung der Rechnung wird im Audit-Log protokolliert
-
-**Lernfeld:** LF12a – Kundenspezifische Anwendungsentwicklung durchführen (Fachrichtung Anwendungsentwicklung)
-**Bündelungsfach:** Gestaltung von IT-Dienstleistungen
-**Aufwand (T-Shirt-Größe):** XL (mehr als 16 Std.)
-
-**Labels:** `user-story`, `lernfeld-LF12a`, `fachrichtung-AE`, `size-XL`
-
----
-
-## 20. Zahlungsabwicklung anbinden
-
-**Als** Kunde
-**möchte ich** eine offene Rechnung direkt online bezahlen können (z. B. per Überweisung mit Referenz oder Zahlungsdienstleister),
-**damit** der Bezahlvorgang für mich einfach ist und der Verleiher den Zahlungseingang automatisch zuordnen kann.
-
-**Voraussetzung:** #20 (Rechnung wird erzeugt)
-
-**Akzeptanzkriterien**
-- [ ] Rechnung zeigt Zahlungsstatus (offen/bezahlt/überfällig)
-- [ ] Zahlungseingänge werden automatisiert oder halbautomatisiert einer Rechnung zugeordnet
-- [ ] Bei überfälligen Zahlungen wird eine Erinnerung ausgelöst
-- [ ] Zahlungsdaten (z. B. Kartendaten) werden nicht selbst gespeichert, sondern über einen zertifizierten Zahlungsdienstleister verarbeitet
-- [ ] Jede Statusänderung ist im Audit-Log nachvollziehbar
+- [ ] Für einen abgeschlossenen Auftrag wird höchstens ein Rechnungsdatensatz mit eindeutiger Rechnungsnummer angelegt
+- [ ] Der Datensatz enthält Kunde, Auftrag, Leistungszeitraum, Rechnungsdatum, Einzelpositionen, Steuersatz und Steuerbetrag; fehlende Pflichtdaten verhindern die Erzeugung und werden benannt
+- [ ] Nach Erzeugung sind Rechnungsdaten nicht überschreibbar; Korrektur oder Storno erzeugt einen verknüpften neuen Datensatz
+- [ ] Für den Datensatz wird ein PDF erstellt, dessen angezeigte Werte mit den gespeicherten Rechnungsdaten übereinstimmen
+- [ ] Erzeugung und Korrektur werden mit Nutzer und Zeitstempel protokolliert
+- [ ] Die fachliche Prüfung der aktuell geltenden steuerrechtlichen und GoBD-Anforderungen erfolgt vor produktivem Einsatz; diese Projektstory ersetzt keine Rechtsberatung
 
 **Lernfeld:** LF12a – Kundenspezifische Anwendungsentwicklung durchführen (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Gestaltung von IT-Dienstleistungen
@@ -459,17 +465,44 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 21. Kundenportal – eigene Buchungen und Rechnungen einsehen
+## 20. Zahlungsabwicklung anbinden
 
 **Als** Kunde
-**möchte ich** in einem persönlichen Bereich alle meine Reservierungen, Aufträge und Rechnungen auf einen Blick sehen können,
-**damit** ich jederzeit den Überblick über meine Ausleihen und offenen Zahlungen habe, ohne nachfragen zu müssen.
+**möchte ich** den Zahlungsstatus einer Rechnung einsehen und einen erfassten Zahlungseingang eindeutig zuordnen können,
+**damit** offene und bezahlte Rechnungen für Kunde und Verleih nachvollziehbar sind.
+
+**Voraussetzung:** #20 (Rechnung wird erzeugt)
 
 **Akzeptanzkriterien**
-- [ ] Übersicht zeigt aktive, vergangene und stornierte Reservierungen/Aufträge
-- [ ] Rechnungen sind einzeln aufrufbar und als PDF herunterladbar
-- [ ] Kunde sieht ausschließlich eigene Daten (siehe #11 – Rollen und Zugriffsrechte)
-- [ ] Oberfläche ist gemäß ISO 9241 barrierefrei bedienbar
+- [ ] Eine Rechnung zeigt einen der dokumentierten Status „offen“, „bezahlt“ oder „überfällig“
+- [ ] Ein berechtigter Mitarbeiter kann einen Zahlungseingang mit Betrag, Datum und Referenz genau einer Rechnung zuordnen
+- [ ] Eine Zuordnung mit abweichendem Betrag oder bereits zugeordneter Referenz wird zur Prüfung markiert statt doppelt verbucht
+- [ ] Der Kunde sieht den Zahlungsstatus seiner eigenen Rechnung, aber keine Zahlungsdaten anderer Kunden
+- [ ] Status- und Zuordnungsänderungen sind mit Nutzer und Zeitstempel nachvollziehbar
+- [ ] Kartenzahlung und Anbindung eines externen Zahlungsdienstleisters sind nicht Bestandteil dieses ersten Zahlungsstatus-Schritts
+
+**Lernfeld:** LF12a – Kundenspezifische Anwendungsentwicklung durchführen (Fachrichtung Anwendungsentwicklung)
+**Bündelungsfach:** Gestaltung von IT-Dienstleistungen
+**Aufwand (T-Shirt-Größe):** L (16 Std.)
+
+**Labels:** `user-story`, `lernfeld-LF12a`, `fachrichtung-AE`, `size-L`
+
+---
+
+## 21. Kundenportal – eigene Reservierungen und Aufträge ansehen
+
+**Als** Kunde
+**möchte ich** meine eigenen Reservierungen und zugehörigen Aufträge in einem persönlichen Bereich ansehen können,
+**damit** ich den Stand meiner Buchungen ohne Nachfrage nachvollziehen kann.
+
+**Voraussetzung:** #11 (Kundenanmeldung) sowie #5 (Reservierungen) und #12 (Aufträge)
+
+**Akzeptanzkriterien**
+- [ ] Nach der Anmeldung werden aktive, vergangene und stornierte Reservierungen mit Maschine, Zeitraum und Status angezeigt
+- [ ] Zu einer Reservierung wird der zugehörige Auftrag mit Nummer und aktuellem Status angezeigt, sofern vorhanden
+- [ ] Ein Kunde kann weder über die Oberfläche noch durch Änderung einer URL fremde Reservierungen oder Aufträge abrufen (#11)
+- [ ] Bei fehlenden Buchungen wird ein verständlicher leerer Zustand angezeigt
+- [ ] Rechnungsansicht und PDF-Download werden in einer eigenen Ausbaustory ergänzt
 
 **Lernfeld:** LF10a – Benutzerschnittstellen gestalten und entwickeln (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -482,14 +515,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 22. Verwaltungsoberfläche für Mitarbeiter
 
 **Als** Verleih-Mitarbeiter
-**möchte ich** alle Reservierungen und Aufträge in einer zentralen Oberfläche einsehen, filtern und bei Bedarf manuell anpassen können,
-**damit** ich Sonderfälle (z. B. telefonische Buchungen, Reklamationen) bearbeiten kann, ohne direkt in der Datenbank arbeiten zu müssen.
+**möchte ich** Reservierungen und Aufträge in einer Verwaltungsübersicht nach Status, Kunde und Zeitraum finden können,
+**damit** ich Kundenanfragen und offene Vorgänge gezielt bearbeiten kann, ohne direkt auf die Datenbank zuzugreifen.
+
+**Voraussetzung:** #11 (Mitarbeiterrolle), #5 (Reservierungen) und #12 (Aufträge)
 
 **Akzeptanzkriterien**
-- [ ] Liste aller Reservierungen/Aufträge mit Filter nach Status, Kunde, Zeitraum und Maschine
-- [ ] Mitarbeiter kann Status manuell ändern (z. B. Auftrag stornieren, Sonderkonditionen vermerken)
-- [ ] Jede manuelle Änderung wird im Audit-Log protokolliert (wer, was, wann)
-- [ ] Zugriff ist auf die Rolle „Mitarbeiter“/„Admin“ beschränkt
+- [ ] Angemeldete Mitarbeiter sehen eine paginierte Liste von Reservierungen und Aufträgen mit Status, Kunde, Maschine und Zeitraum
+- [ ] Filter nach Status und Zeitraum liefern nur passende Datensätze; Kombinationen der Filter funktionieren gemeinsam
+- [ ] Ein Mitarbeiter kann einen Datensatz öffnen und dessen vollständige Übersicht ansehen
+- [ ] Ein Kunde oder nicht angemeldeter Nutzer kann diese Verwaltungsansicht nicht aufrufen
+- [ ] Manuelle Statusänderungen und Sonderkonditionen sind nicht Teil dieser Lesescheibe und werden separat spezifiziert
 
 **Lernfeld:** LF11a – Funktionalität in Anwendungen realisieren (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -502,14 +538,15 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 23. Online-Shop für Verbrauchsmaterial anbinden
 
 **Als** Kunde
-**möchte ich** passendes Verbrauchsmaterial (z. B. Öl, Ersatzteile) direkt im Zusammenhang mit einer gemieteten Maschine online bestellen können,
-**damit** ich alles Nötige für den Betrieb der Maschine an einer Stelle bekomme, ohne einen separaten Lieferanten suchen zu müssen.
+**möchte ich** ein für meinen gemieteten Maschinentyp freigegebenes Verbrauchsmaterial in einer Bestellung anfordern können,
+**damit** ich benötigtes Material zusammen mit der Maschinenmiete beim Verleiher bestellen kann.
 
 **Akzeptanzkriterien**
-- [ ] Produktkatalog für Verbrauchsmaterial mit Bestand, Preis und Verknüpfung zu passenden Maschinentypen
-- [ ] Bestellung erzeugt einen Auftrag/eine Position, die zusammen mit der Maschinenmiete abgerechnet werden kann
-- [ ] Lagerbestand wird bei Bestellung reduziert und bei Unterschreiten eines Mindestbestands markiert
-- [ ] Bestellhistorie ist pro Kunde einsehbar
+- [ ] Der Katalog zeigt aktive Produkte mit Bezeichnung, Preis, verfügbarem Bestand und kompatiblen Maschinentypen
+- [ ] Ein Kunde kann nur ein Produkt für einen zugehörigen Maschinentyp bestellen; nicht verfügbare oder inkompatible Produkte werden abgewiesen
+- [ ] Eine erfolgreiche Bestellung erzeugt eine eindeutig referenzierte Bestellposition und reduziert den Bestand genau einmal
+- [ ] Reicht der Bestand nicht aus, wird keine Bestellung angelegt und der verfügbare Bestand angezeigt
+- [ ] Bestellung und Bestand werden nach einem Fehler gemeinsam zurückgerollt, sodass kein halbfertiger Vorgang entsteht
 
 **Lernfeld:** LF12a – Kundenspezifische Anwendungsentwicklung durchführen (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Gestaltung von IT-Dienstleistungen
@@ -522,15 +559,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 24. Barrierefreiheitsprüfung nach ISO 9241 durchführen
 
 **Als** Anwendungsentwickler
-**möchte ich** die zentralen Oberflächen der Anwendung systematisch auf Barrierefreiheit nach ISO 9241 prüfen und gefundene Mängel beheben,
-**damit** die Anwendung von möglichst vielen Nutzergruppen (z. B. mit Sehbeeinträchtigung oder motorischen Einschränkungen) bedienbar ist.
+**möchte ich** den Buchungsablauf mit einer automatisierten und manuellen Barrierefreiheitsprüfung untersuchen,
+**damit** wesentliche Bedienhindernisse vor dem Ausbau weiterer Oberflächen erkannt und behoben werden.
+
+**Voraussetzung:** #5 (Buchungsablauf ist umgesetzt)
 
 **Akzeptanzkriterien**
-- [ ] Zentrale Seiten (Suche/Reservierung, Kundenportal, Verwaltung) sind mit einem automatisierten Tool (z. B. axe, Lighthouse) geprüft
-- [ ] Tastaturbedienbarkeit ist für alle zentralen Funktionen sichergestellt
-- [ ] Kontraste, Beschriftungen (Labels/ARIA) und Fokusreihenfolge entsprechen den Grundanforderungen von ISO 9241
-- [ ] Gefundene Mängel sind dokumentiert und die kritischen sind behoben
-- [ ] Ergebnis ist als kurzer Prüfbericht dokumentiert
+- [ ] Die vorhandenen Seiten des Buchungsablaufs werden mit einem festgelegten automatisierten Prüfwerkzeug geprüft; Werkzeug und Ergebnis sind dokumentiert
+- [ ] Nutzer können den Ablauf ausschließlich mit Tastatur bedienen; Fokus ist stets sichtbar und folgt der visuellen Reihenfolge
+- [ ] Eingabefelder besitzen programmatisch zugeordnete Beschriftungen und Fehler werden dem betroffenen Feld zugeordnet
+- [ ] Gefundene Blocker für Tastaturbedienung oder Formularverständnis werden behoben; übrige Befunde sind mit Schweregrad und Folgeaufgabe dokumentiert
+- [ ] Ein kurzer Prüfbericht nennt geprüfte Seiten, Browser, Werkzeug, Befunde und erneutes Prüfergebnis
+- [ ] Kundenportal und Verwaltungsoberfläche werden erst geprüft, wenn diese Seiten umgesetzt sind
 
 **Lernfeld:** LF10a – Benutzerschnittstellen gestalten und entwickeln (Fachrichtung Anwendungsentwicklung)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -540,18 +580,21 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 25. Backup- und Restore-Konzept für alle Dienste
+## 25. Backup und Wiederherstellung für Datenbank und Anwendung
 
 **Als** Systemadministrator
-**möchte ich** ein einheitliches Backup-Konzept für alle produktiven Dienste (Anwendung, Datenbank, Mailserver, Dateien) erstellen und automatisiert umsetzen,
-**damit** im Fehlerfall kein Datenverlust entsteht und der Betrieb zuverlässig wiederhergestellt werden kann.
+**möchte ich** für Datenbank und Anwendungsdaten einen überprüfbaren Backup- und Restore-Ablauf einrichten,
+**damit** ein Datenverlust durch einen getesteten Wiederherstellungsweg begrenzt werden kann.
+
+**Voraussetzung:** #14 (Datenbankserver ist bereitgestellt)
 
 **Akzeptanzkriterien**
-- [ ] Für jeden Dienst ist festgelegt, was, wie oft und wohin gesichert wird
-- [ ] Backups laufen automatisiert (z. B. per Cronjob/Systemd-Timer) und sind versioniert im IaC-Setup hinterlegt
-- [ ] Backups liegen getrennt vom Produktivsystem (z. B. externer Speicher)
-- [ ] Ein vollständiger Restore aus dem Backup wurde mindestens einmal erfolgreich getestet und dokumentiert
-- [ ] Aufbewahrungsfristen sind festgelegt und begründet
+- [ ] Gesicherte Daten, Sicherungsintervall, Aufbewahrungsdauer und Speicherort sind für Datenbank und Anwendungsdateien dokumentiert
+- [ ] Sicherung wird automatisiert gestartet; Laufzeitpunkt und Erfolg oder Fehler sind prüfbar
+- [ ] Mindestens eine Sicherung liegt außerhalb des laufenden Datenbankcontainers bzw. dessen alleiniger Datenträgerinstanz
+- [ ] Ein Restore wird in eine getrennte Testinstanz durchgeführt; ein dokumentierter Prüfdatensatz ist danach lesbar
+- [ ] Bei fehlgeschlagener Sicherung wird ein Fehler sichtbar gemeldet und die letzte erfolgreiche Sicherung bleibt erhalten
+- [ ] Mailserver- und Objektspeicher-Backups werden nach Bereitstellung dieser Dienste in den Ablauf aufgenommen
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -564,14 +607,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 26. Monitoring und Alerting für Anwendung und Reverse Proxy
 
 **Als** Systemadministrator
-**möchte ich** Verfügbarkeit, Antwortzeiten und Fehlerraten von Client-Server-Anwendung und Reverse Proxy laufend überwachen,
-**damit** Ausfälle oder Leistungsprobleme erkannt werden, bevor Kunden sie melden.
+**möchte ich** die Erreichbarkeit und Antwortzeit der Anwendung über den Reverse Proxy überwachen,
+**damit** ein Ausfall oder eine deutliche Verschlechterung frühzeitig sichtbar wird.
+
+**Voraussetzung:** #8 (Reverse Proxy) und #9 (Anwendung ist erreichbar)
 
 **Akzeptanzkriterien**
-- [ ] Monitoring erfasst Erreichbarkeit, Antwortzeiten und HTTP-Fehlerraten der Anwendung
-- [ ] Bei Ausfall oder Grenzwertüberschreitung wird automatisch eine Benachrichtigung ausgelöst
-- [ ] Ein einfaches Dashboard zeigt den aktuellen Systemzustand
-- [ ] Monitoring-Konfiguration liegt versioniert im Repository (IaC)
+- [ ] Ein regelmäßig ausgeführter Probe-Aufruf erfasst HTTP-Erreichbarkeit, Antwortzeit und Fehlerstatus der Anwendung
+- [ ] Ein Ausfall über den festgelegten Zeitraum löst eine sichtbare Benachrichtigung aus
+- [ ] Ein Dashboard zeigt den letzten Messzeitpunkt und die letzten Probe-Ergebnisse
+- [ ] Die Monitoring-Konfiguration ist versioniert und nach einem Neustart weiterhin aktiv
+- [ ] Datenbank- und Mailserver-spezifische Metriken werden in den dafür vorgesehenen Betriebsschritten ergänzt
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -581,18 +627,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 27. CI/CD-Pipeline für Build, Test und Deployment
+## 27. Automatisierte Builds und Tests für Änderungen
 
 **Als** Entwicklerteam
-**möchte ich** dass Änderungen am Code automatisiert gebaut, getestet und auf den Server ausgerollt werden,
-**damit** neue Funktionen schnell und ohne manuelle Fehlerquellen produktiv verfügbar sind.
+**möchte ich** bei jedem Pull Request automatisiert Build und Tests ausführen lassen,
+**damit** fehlerhafte Änderungen erkannt werden, bevor sie in den Hauptbranch übernommen werden.
 
 **Akzeptanzkriterien**
-- [ ] Push auf den Hauptbranch löst automatisch Build und Testlauf aus
-- [ ] Fehlgeschlagene Tests verhindern das Deployment
-- [ ] Erfolgreiches Deployment rollt die neue Version automatisiert auf den Server aus (z. B. via SSH/Container-Registry)
-- [ ] Pipeline-Konfiguration liegt versioniert im Repository
-- [ ] Ein Rollback auf die vorherige Version ist mit einem definierten Schritt möglich
+- [ ] Ein Pull Request startet automatisch den Build und die vorhandenen automatisierten Tests für Client und Server
+- [ ] Der Status der Prüfungen ist am Pull Request sichtbar; fehlgeschlagene Pflichtprüfungen verhindern den Merge
+- [ ] Die Pipeline-Konfiguration liegt versioniert im Repository und funktioniert bei einem erneuten Lauf ohne manuelle Änderungen
+- [ ] Geheimnisse werden nur über geschützte CI-Variablen bereitgestellt und nicht im Log ausgegeben
+- [ ] Deployment und Rollback werden separat geplant, sobald Zielumgebung und Freigabeprozess feststehen
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -605,14 +651,17 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 28. Objektspeicher für Dateien bereitstellen
 
 **Als** Systemadministrator
-**möchte ich** einen S3-kompatiblen Objektspeicher für Dateien wie Rechnungs-PDFs und Maschinenbilder bereitstellen,
-**damit** Dateien zentral, sicher und unabhängig vom Anwendungsserver abgelegt werden können.
+**möchte ich** eine Datei über eine dokumentierte S3-kompatible Schnittstelle sicher speichern und wieder abrufen können,
+**damit** Anwendungsdateien nicht ausschließlich im Dateisystem des Anwendungscontainers liegen.
+
+**Voraussetzung:** #9 (Anwendung kann den Dienst über eine Schnittstelle testen)
 
 **Akzeptanzkriterien**
-- [ ] Objektspeicher läuft containerisiert und ist per IaC-Skript reproduzierbar aufsetzbar
-- [ ] Zugriff erfolgt ausschließlich über Zugangsschlüssel, keine öffentlich beschreibbaren Buckets
-- [ ] Die Anwendung kann eine Testdatei erfolgreich hoch- und herunterladen
-- [ ] Backups des Objektspeichers sind Teil des Backup-Konzepts (siehe #26)
+- [ ] Der Objektspeicher startet mit versionierter Konfiguration reproduzierbar und verwendet persistenten Speicher
+- [ ] Ein privater Bucket ist angelegt; anonyme Lese- und Schreibzugriffe werden abgewiesen
+- [ ] Die Anwendung lädt eine Testdatei mit Zugangsdaten hoch, ruft sie wieder ab und der Dateiinhalt stimmt überein
+- [ ] Falsche Zugangsdaten oder fehlende Berechtigung führen zu einer Fehlerantwort ohne Offenlegung der Schlüssel
+- [ ] Zugangsschlüssel liegen außerhalb des Repositorys; Backup wird in #26 ergänzt
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -625,14 +674,18 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 ## 29. Zentrales Log-Management für alle Container-Dienste
 
 **Als** Systemadministrator
-**möchte ich** die Logs aller Container-Dienste zentral sammeln und durchsuchbar machen,
-**damit** ich bei Störungen oder Sicherheitsvorfällen schnell die Ursache über alle Dienste hinweg finden kann.
+**möchte ich** die Anwendungs- und Reverse-Proxy-Logs zentral nach Dienst und Zeitraum durchsuchen können,
+**damit** ich die Ursache eines Fehlers ohne Zugriff auf einzelne Container nachvollziehen kann.
+
+**Voraussetzung:** #8 (Container- und Reverse-Proxy-Umgebung ist verfügbar)
 
 **Akzeptanzkriterien**
-- [ ] Logs aller produktiven Container laufen in einer zentralen Sammelstelle zusammen
-- [ ] Logs sind nach Dienst, Zeitraum und Suchbegriff filterbar
-- [ ] Log-Aufbewahrung ist zeitlich begrenzt und begründet festgelegt (Speicherplatz, Datenschutz)
-- [ ] Zugriff auf die Logs ist auf berechtigte Rollen beschränkt
+- [ ] Anwendungs- und Reverse-Proxy-Logs werden mit Zeitstempel und Dienstkennung an einer zentralen Stelle gesammelt
+- [ ] Eine Suche kann mindestens nach Dienst, Zeitraum und Textbegriff filtern
+- [ ] Die Aufbewahrungsdauer ist dokumentiert; abgelaufene Einträge werden automatisch entfernt
+- [ ] Zugangsdaten und Passwörter werden vor dem Speichern aus den Anwendungslogs entfernt
+- [ ] Nur berechtigte Teamkonten können auf die Logs zugreifen
+- [ ] Logs weiterer Container werden ergänzt, sobald diese produktiv bereitgestellt sind
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -642,17 +695,21 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 30. Notfallwiederherstellung der Gesamtumgebung proben
+## 30. Wiederherstellung von Anwendung und Datenbank erproben
 
 **Als** Systemadministrator
-**möchte ich** den vollständigen Ausfall der Serverumgebung simulieren und die Wiederherstellung aus IaC-Skripten und Backups einmal komplett durchspielen,
-**damit** im echten Notfall klar ist, dass und wie schnell die Umgebung wiederhergestellt werden kann.
+**möchte ich** die Wiederherstellung der bereitgestellten Anwendung und Datenbank in einer getrennten Testumgebung erproben,
+**damit** wir belegen können, dass die vorhandenen IaC- und Backup-Schritte im Notfall ausführbar sind.
+
+**Voraussetzung:** #9 (Anwendung), #14 (Datenbankserver) und #26 (Backup-Ablauf ist verfügbar)
 
 **Akzeptanzkriterien**
-- [ ] Ein definierter Ablaufplan für die Notfallwiederherstellung liegt dokumentiert vor
-- [ ] Die Wiederherstellung wurde mindestens einmal auf einer separaten Umgebung vollständig durchgeführt
-- [ ] Die dafür benötigte Zeit (Recovery Time) ist gemessen und dokumentiert
-- [ ] Erkannte Lücken im IaC-Setup oder Backup-Konzept sind nachgebessert
+- [ ] Ein Ablaufplan nennt benötigte IaC-Version, Backup, Zugangsvoraussetzungen und Wiederherstellungsschritte
+- [ ] Eine getrennte Testumgebung wird aus IaC bereitgestellt und ein Datenbank-Backup darin wiederhergestellt
+- [ ] Nach dem Restore sind Anwendung und ein dokumentierter Prüffall erfolgreich erreichbar bzw. lesbar
+- [ ] Wiederherstellungsdauer und Abweichungen vom Ablaufplan werden festgehalten
+- [ ] Kritische Lücken erhalten jeweils eine verknüpfte Folgeaufgabe; die Produktion wird bei diesem Test nicht verändert
+- [ ] Mailserver, Objektspeicher und weitere Dienste werden erst nach deren Einbindung in den Backup-Ablauf ergänzt
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement

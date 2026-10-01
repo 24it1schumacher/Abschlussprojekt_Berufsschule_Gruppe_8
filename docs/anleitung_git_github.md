@@ -173,6 +173,6 @@ Vorbeugen: Geheimnisse gehören in eine `.env`-Datei, die in `.gitignore` steht.
 
 - **Erst selbst versuchen:** `git status` lesen, die Fehlermeldung in Ruhe lesen (Git sagt meist, was zu tun ist), diese Anleitung und die offizielle Doku durchsuchen. Auch `git help <befehl>` (z. B. `git help push`) erklärt jeden Befehl.
 - Danach den Kollegen fragen.
-- Zuletzt Claude Code fragen. Die Datei `CLAUDE.md` weist Claude an, zu erklären und euch die Befehle selbst tippen zu lassen, damit ihr es lernt.
+- Zuletzt, wenn nötig, eine KI als Hilfe fragen. Sie soll erklären, nicht für euch arbeiten.
 - Offizielles Buch (Deutsch, kostenlos): https://git-scm.com/book/de/v2
 - GitHub-Hilfe: https://docs.github.com/de

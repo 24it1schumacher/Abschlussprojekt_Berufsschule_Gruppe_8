@@ -97,24 +97,25 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
-## 4. Infrastruktur automatisiert bereitstellen (Infrastructure-as-Code)
+## 4. Reverse Proxy automatisiert bereitstellen (Infrastructure-as-Code)
 
 **Als** Entwicklerteam
-**möchte ich** einen Platzhalterdienst und einen Reverse Proxy mit versionierter Konfiguration reproduzierbar bereitstellen können,
-**damit** das Team eine wiederholbare Grundlage für die späteren Anwendungsdienste hat.
+**möchte ich** den Reverse Proxy per Infrastructure-as-Code/Configuration-as-Code automatisiert aufsetzen können,
+**damit** die Umgebung jederzeit reproduzierbar zerstört und neu aufgebaut werden kann, statt alles manuell zu konfigurieren.
+
+**Voraussetzung:** #XX (Docker ist auf dem Server installiert, siehe Story 31)
 
 **Akzeptanzkriterien**
-- [ ] Ein dokumentierter IaC-/Configuration-as-Code-Aufruf startet den Platzhalterdienst und den Reverse Proxy auf der Zielumgebung
-- [ ] Nach einem Stoppen und erneuten Start mit leerer Laufzeitumgebung stehen beide Dienste mit derselben versionierten Konfiguration wieder bereit
-- [ ] Eine externe Testanfrage erreicht über den Reverse Proxy den Platzhalterdienst und erhält die erwartete Antwort
-- [ ] Verwendete Ports und erforderliche Konfigurationswerte sind dokumentiert; Geheimnisse liegen nicht im Repository
-- [ ] Automatische Zertifikatsbeschaffung wird separat in #18 umgesetzt
+- [ ] Ein Skript/Playbook (z. B. Ansible, Docker Compose) richtet den Reverse Proxy vollautomatisch ein
+- [ ] Die gesamte Konfiguration liegt versioniert im Git-Repository
+- [ ] Nach vollständigem Löschen der Umgebung stellt ein einzelner Befehl sie wieder her
+- [ ] Der Reverse Proxy leitet eine Testanfrage per HTTPS mit gültigem Zertifikat an einen Platzhalterdienst weiter
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
-**Aufwand (T-Shirt-Größe):** L (16 Std.)
+**Aufwand (T-Shirt-Größe):** M (8 Std.)
 
-**Labels:** `user-story`, `lernfeld-LF9`, `fachrichtung-SI`, `size-L`
+**Labels:** `user-story`, `lernfeld-LF9`, `fachrichtung-SI`, `size-M`
 
 ---
 
@@ -400,7 +401,7 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 **möchte ich** Container mit meinem Entwicklerkonto im Rootless-Modus starten und stoppen können,
 **damit** ich Entwicklungsdienste betreiben kann, ohne Mitglied der privilegierten Docker-Gruppe zu sein.
 
-**Voraussetzung:** #8 (Docker installiert) und #2 (AE-Konto vorhanden)
+**Voraussetzung:** #XX (Docker installiert, Story 31) und #2 (AE-Konto vorhanden)
 
 **Akzeptanzkriterien**
 - [ ] Das AE-Konto hat gültige Subordinate UID/GID-Bereiche und der Rootless-Docker-Dienst startet ohne Root-Daemon
@@ -719,6 +720,28 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
+## 31. Docker auf dem Server installieren und einsatzbereit machen
+
+**Als** Systemadministrator
+**möchte ich** Docker (inkl. Docker Compose) auf dem VPS installieren und mit einem Testcontainer prüfen,
+**damit** alle weiteren Dienste (Reverse Proxy, Datenbank, Mailserver, Anwendung) als Container betrieben werden können.
+
+**Voraussetzung:** #2 (persönliche Konten vorhanden) und #3 (Server ist gehärtet)
+
+**Akzeptanzkriterien**
+- [ ] Docker Engine und Docker Compose sind auf dem VPS aus der offiziellen Paketquelle installiert
+- [ ] Ein Testcontainer (z. B. `hello-world`) läuft erfolgreich
+- [ ] Die Installation liegt als Skript versioniert im Git-Repository und ist reproduzierbar ausführbar
+- [ ] Das Vorgehen ist kurz dokumentiert (Version, Installationsschritte)
+
+**Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
+**Bündelungsfach:** Entwicklung vernetzter Prozesse
+**Aufwand (T-Shirt-Größe):** S (4 Std.)
+
+**Labels:** `user-story`, `lernfeld-LF10b`, `fachrichtung-SI`, `size-S`
+
+---
+
 ## Mapping: Story-Nummer (dieses Dokument) ↔ GitHub-Issue-Nummer
 
 | Story | Issue | Story | Issue | Story | Issue |
@@ -733,5 +756,6 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 | 8 | #12 | 18 | #19 | 28 | #29 |
 | 9 | #13 | 19 | #20 | 29 | #30 |
 | 10 | #14 | 20 | #21 | 30 | #31 |
+| 31 | #XX (nach Anlage eintragen) | | | | |
 
 Hinweis: In den Story-Texten oben stehen Querverweise bereits direkt als `#<Issue-Nummer>`.

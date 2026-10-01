@@ -1,0 +1,6 @@
+# Lerntagebuch – Lasse Fischer
+
+| Datum | Tätigkeit | Problem | Lösung | Lessons Learned |
+|---|---|---|---|---|
+| 01.10.2026 | Firewall (ufw) auf dem VPS einrichten und von außen prüfen | Noch nie mit einer Firewall gearbeitet. Unklar, wie man prüft, dass nur benötigte Ports erreichbar sind. Gefahr, sich per SSH selbst auszusperren. | Ist-Zustand mit `ss -tulpn` und `ufw status` erfasst. Von außen mit nmap vorher/nachher gescannt. Regeln mit Default deny angelegt und mit `ufw show added` geprüft, SSH (22/tcp) erlaubt, dann erst `ufw enable`. Zweites SSH-Fenster zum Testen offen gelassen. | Default deny ist sicherer als Default allow. Reihenfolge ist wichtig: erst SSH erlauben, dann aktivieren. `closed` (Server antwortet mit RST) und `filtered` (Firewall verwirft still) sind nicht dasselbe. Nur ein Test von außen beweist die Wirkung. |
+| 01.10.2026 | Firewall-Anleitung in `docs/` dokumentieren | Das Kriterium spricht von „geschlossen", gemessen wurde aber `filtered`. | Abweichung in der Doku offen begründet. Anleitung `docs/anleitung_firewall_ufw.md` geschrieben und per Pull Request eingereicht. | Eine Messung gehört mit Rohausgabe in die Doku, und Grenzen des Tests (nur TCP, ein Standort) nennt man selbst. |

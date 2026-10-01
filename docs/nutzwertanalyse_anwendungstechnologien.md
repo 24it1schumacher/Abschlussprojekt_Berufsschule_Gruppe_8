@@ -6,7 +6,7 @@
 
 Der persönliche Lernerfolg ist ein wichtiges Ziel: Nach eigener Angabe wurden in der Firma bereits C# und HTML verwendet. C# wird deshalb nicht als ernsthafte Auswahloption gewertet; vorhandene Kenntnisse sollen nicht das Lernziel verdrängen.
 
-Das Projekt verlangt einen Browser-Client und laut User Story 5 eine objektorientierte Server-Anwendung. Der Server soll über eine Datenbank-API auf die Datenbank zugreifen; der Client ruft den Server auf. Die konkrete Framework- und Anwendungsstruktur sind laut [app/README.md](../app/README.md) noch offen. Die Bewertungen vergleichen deshalb Programmiersprachen bzw. Laufzeitumgebungen und treffen **keine** Framework-Entscheidung.
+Das Projekt verlangt einen Browser-Client und laut User Story 5 eine objektorientierte Server-Anwendung. Der Server soll über eine Datenbank-API auf die Datenbank zugreifen; der Client ruft den Server auf. TypeScript für das Frontend und Java für das Backend wurden am 01.10.2026 als Projektauswahl festgelegt; die konkrete Framework- und Anwendungsstruktur sind laut [app/README.md](../app/README.md) noch offen. Die Bewertungen vergleichen deshalb Programmiersprachen bzw. Laufzeitumgebungen und treffen **keine** Framework-Entscheidung.
 
 ## 2. Kriterien, Gewichte und Skala
 
@@ -65,11 +65,11 @@ Verglichen werden Java, TypeScript auf Node.js und Python. Node.js ist eine Java
 
 ## 5. Empfehlung und Einschränkungen
 
-**Empfehlung: TypeScript im Frontend und Java im Backend**, vorläufig bis zur Abstimmung im Team. Die Kombination erreicht in beiden Teilanalysen jeweils **4,75 von 5 Punkten** und unterstützt den gewünschten Kompetenzaufbau. Java passt außerdem unmittelbar zur in User Story 5 verlangten objektorientierten Server-Anwendung.
+**Beschlossene Auswahl: TypeScript im Frontend und Java im Backend.** Die Kombination erreicht in beiden Teilanalysen jeweils **4,75 von 5 Punkten** und unterstützt den gewünschten Kompetenzaufbau. Java passt außerdem unmittelbar zur in User Story 5 verlangten objektorientierten Server-Anwendung. Die Auswahl wurde am 01.10.2026 getroffen; die noch ausstehende formelle Teamabstimmung ist im [Decision Board](decision_board.md) vermerkt.
 
 Die Schnittstellen sollten klar getrennt bleiben: **Browser-Client → HTTP-API des Java-Servers → Datenbank-API/Treiber des Servers → Datenbank.** Der Browser erhält keine Datenbank-Zugangsdaten und verbindet sich nicht direkt mit der Datenbank. Die in der separaten [Nutzwertanalyse zum Datenbanksystem](nutzwertanalyse_datenbanksystem.md) ausgesprochene vorläufige PostgreSQL-Empfehlung ändert daran nichts; Java kann Datenbanken über JDBC anbinden. Datenbank oder Schema sollen nicht unbemerkt durch ein Tool erstellt werden. Falls Migrationen verwendet werden, müssen sie explizit und nachvollziehbar ausgeführt werden, damit die Vorgabe aus User Story 5 eingehalten wird.
 
-Die Wahl von Java legt noch kein Backend-Framework fest. Ein Java-Webframework und ein Frontend-Framework bzw. Build-Werkzeug müssen in einem nächsten Schritt nach Lernaufwand, Teamkenntnissen und Bereitstellung geprüft werden. Ebenso müssen Containergröße, Startzeit und Ressourcenverbrauch auf dem konkreten Strato-VPS praktisch getestet werden; diese Werte sind hier nicht gemessen. Die Bewertung des Lerngewinns beruht auf der persönlichen Angabe zur Vorerfahrung und sollte bei abweichenden Erfahrungen weiterer Teammitglieder angepasst werden.
+Die Sprachwahl legt noch keine Frameworks fest. Ein Java-Webframework und ein Frontend-Framework bzw. Build-Werkzeug müssen in einem nächsten Schritt nach Lernaufwand, Teamkenntnissen und Bereitstellung geprüft werden. Ebenso müssen Containergröße, Startzeit und Ressourcenverbrauch auf dem konkreten Strato-VPS praktisch getestet werden; diese Werte sind hier nicht gemessen. Die Bewertung des Lerngewinns beruht auf der persönlichen Angabe zur Vorerfahrung und sollte bei abweichenden Erfahrungen weiterer Teammitglieder angepasst werden.
 
 ### Sensitivität: Was könnte die Empfehlung ändern?
 
@@ -81,7 +81,7 @@ Die Wahl von Java legt noch kein Backend-Framework fest. Ein Java-Webframework u
 ## 6. Nächste Schritte für die Teamabstimmung
 
 1. Die Gewichte und Punkte mit dem Team bestätigen; insbesondere den Lerngewinn und die objektorientierte Serveranforderung gemeinsam einordnen.
-2. TypeScript und Java als vorläufige Sprachwahl beschließen oder die Analyse bei abweichenden Teamzielen anpassen.
+2. Die festgelegte Sprachwahl im Team abstimmen und die Analyse bei abweichenden Teamzielen anpassen.
 3. Frontend- und Backend-Framework getrennt auswählen und einen kleinen Prototyp erstellen: Der Client ruft einen Java-Endpunkt auf; der Java-Server liest und schreibt einen Beispieldatensatz über den Datenbanktreiber.
 4. Sicherstellen, dass Zugangsdaten ausschließlich serverseitig genutzt werden und Setup bzw. Migrationen die Datenbank nicht stillschweigend erzeugen.
 5. Den Prototyp containerisiert auf dem Strato-VPS testen und Architektur sowie endgültige Teamentscheidung dokumentieren.

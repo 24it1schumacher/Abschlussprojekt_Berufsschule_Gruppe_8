@@ -4,7 +4,7 @@
 
 ## 1. Ziel und Annahmen
 
-Diese Analyse bewertet die gewünschte Wahl **TypeScript für das Frontend** und **Java für das Backend** im Vergleich zu passenden Alternativen. Der persönliche Lernerfolg ist ein wichtiges Ziel: Nach eigener Angabe wurden in der Firma bereits C# und HTML verwendet. C# wird deshalb nicht als ernsthafte Auswahloption gewertet; vorhandene Kenntnisse sollen nicht das Lernziel verdrängen.
+Der persönliche Lernerfolg ist ein wichtiges Ziel: Nach eigener Angabe wurden in der Firma bereits C# und HTML verwendet. C# wird deshalb nicht als ernsthafte Auswahloption gewertet; vorhandene Kenntnisse sollen nicht das Lernziel verdrängen.
 
 Das Projekt verlangt einen Browser-Client und laut User Story 5 eine objektorientierte Server-Anwendung. Der Server soll über eine Datenbank-API auf die Datenbank zugreifen; der Client ruft den Server auf. Die konkrete Framework- und Anwendungsstruktur sind laut [app/README.md](../app/README.md) noch offen. Die Bewertungen vergleichen deshalb Programmiersprachen bzw. Laufzeitumgebungen und treffen **keine** Framework-Entscheidung.
 

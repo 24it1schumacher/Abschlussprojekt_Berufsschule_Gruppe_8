@@ -1,7 +1,8 @@
 # User Stories – Maschinenverleih (Gesamt-Backlog)
 
 Konsolidierter Backlog aus `user_stories_beispiel.md` (Referenzvorlage) und den bereits
-umgesetzten Server-Stories (`user_stories_server.md`), aufgefüllt auf 30 Stories.
+umgesetzten Server-Stories (`user_stories_server.md`), erweitert um die für das Projekt
+benötigten Umsetzungsschritte.
 Team: 1× Anwendungsentwicklung (AE) + 1× Systemintegration (SI).
 
 Jeder Abschnitt entspricht einer User Story bzw. einem GitHub Issue.
@@ -13,7 +14,7 @@ Issue-Beschreibung übernehmen, Labels wie angegeben setzen.
 
 **Wichtig:** Querverweise zwischen Stories werden unten als `#<Issue-Nummer>` geschrieben
 (z. B. `#8`), nicht als „Story N" — GitHub verlinkt `#N` automatisch auf das richtige Issue.
-Die Story-Nummern 1–30 in dieser Datei sind nur die Reihenfolge in diesem Dokument und
+Die Story-Nummern 1–32 in dieser Datei sind nur die Reihenfolge in diesem Dokument und
 stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Dateiende).
 
 **Qualitätsmaßstab:** Die Stories sind nach INVEST formuliert: unabhängig (bekannte
@@ -746,6 +747,30 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
+## 32. Schnittstellen zwischen Frontend, Backend und Datenbank festlegen
+
+**Als** Anwendungsentwickler
+**möchte ich** die Schnittstellen zwischen TypeScript-Frontend, Java-Backend und PostgreSQL-Datenbank planen und dokumentieren,
+**damit** die Komponenten mit klaren Datenformaten und Verantwortlichkeiten zusammenarbeiten.
+
+**Voraussetzung:** Die Technologiewahl aus #9 (Client-Server-Grundgerüst) und #13 (Datenbanksystem) ist festgehalten.
+
+**Akzeptanzkriterien**
+- [ ] Ein Komponentendiagramm zeigt TypeScript-Frontend → HTTP/JSON-API des Java-Backends → Datenbank-API/Treiber → PostgreSQL; eine direkte Datenbankverbindung aus dem Browser ist ausgeschlossen
+- [ ] Für mindestens einen Beispielablauf sind HTTP-Methode, Route, Anfrage- und Antwortformat sowie relevante Erfolgs- und Fehlercodes dokumentiert
+- [ ] Für den Datenbankzugriff sind der Verantwortungsbereich des Java-Backends, der vorgesehene Treiberzugriff und die Abbildung eines Beispieldatensatzes auf PostgreSQL nachvollziehbar beschrieben
+- [ ] Validierungsfehler und Datenbankfehler werden so in API-Antworten übersetzt, dass keine internen Details oder Zugangsdaten offengelegt werden
+- [ ] Offene Punkte und getroffene Schnittstellenentscheidungen sind dokumentiert und mit dem Team abgestimmt
+- [ ] Die Story dokumentiert Schnittstellen und Datenfluss; die Implementierung des lauffähigen Grundgerüsts bleibt in #9
+
+**Lernfeld:** LF5 – Software zur Verwaltung von Daten anpassen
+**Bündelungsfach:** Softwaretechnologie und Datenmanagement
+**Aufwand (T-Shirt-Größe):** M (8 Std.)
+
+**Labels:** `user-story`, `lernfeld-LF5`, `fachrichtung-AE`, `size-M`
+
+---
+
 ## Mapping: Story-Nummer (dieses Dokument) ↔ GitHub-Issue-Nummer
 
 | Story | Issue | Story | Issue | Story | Issue |
@@ -760,6 +785,7 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 | 8 | #12 | 18 | #19 | 28 | #29 |
 | 9 | #13 | 19 | #20 | 29 | #30 |
 | 10 | #14 | 20 | #21 | 30 | #31 |
-| 31 | #XX (nach Anlage eintragen) | | | | |
+| 31 | #34 | | | | |
+| 32 | #45 | | | | |
 
 Hinweis: In den Story-Texten oben stehen Querverweise bereits direkt als `#<Issue-Nummer>`.

@@ -134,6 +134,8 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 - [ ] Datenbank und Schema werden nicht von ORM, Framework oder anderem Tool implizit erzeugt; Einrichtung und Schemaänderung sind explizit nachvollziehbar
 - [ ] Eine einfache Komponenten- oder Deployment-Übersicht zeigt Client, Server, Datenbank-API und Datenbank
 
+**Festgelegte Technologien (01.10.2026):** TypeScript für das Frontend, Java für das Backend und PostgreSQL als Datenbank. Die Frameworks sind noch auszuwählen; die formelle Teamabstimmung ist im [Decision Board](decision_board.md) zu protokollieren.
+
 **Lernfeld:** LF5 – Software zur Verwaltung von Daten anpassen
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
 **Aufwand (T-Shirt-Größe):** L (16 Std.)
@@ -224,6 +226,8 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 - [ ] Die Analyse enthält eine Empfehlung, Einschränkungen und Faktoren, die das Ergebnis ändern könnten
 - [ ] Das Team bestätigt die Auswahl und hält sie in der Analyse oder einem Architecture Decision Record fest
 - [ ] Die Anwendung greift später ausschließlich über eine Datenbank-API auf das ausgewählte System zu; ein Werkzeug darf Datenbank oder Schema nicht ungefragt erzeugen
+
+**Entscheidungsergebnis (01.10.2026):** PostgreSQL wurde als Projektdatenbank festgelegt. Die Bewertung und Begründung stehen in der [Nutzwertanalyse zum Datenbanksystem](nutzwertanalyse_datenbanksystem.md); die formelle Teamabstimmung ist im [Decision Board](decision_board.md) noch zu protokollieren.
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse

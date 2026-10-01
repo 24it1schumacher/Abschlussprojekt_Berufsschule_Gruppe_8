@@ -83,23 +83,25 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
-## 4. Infrastruktur automatisiert bereitstellen (Infrastructure-as-Code)
+## 4. Reverse Proxy automatisiert bereitstellen (Infrastructure-as-Code)
 
 **Als** Entwicklerteam
-**möchte ich** die Basisinfrastruktur (Container-Technologie und Reverse Proxy) per Infrastructure-as-Code/Configuration-as-Code automatisiert aufsetzen können,
-**damit** die gesamte Umgebung jederzeit reproduzierbar zerstört und neu aufgebaut werden kann, statt alles manuell zu konfigurieren.
+**möchte ich** den Reverse Proxy per Infrastructure-as-Code/Configuration-as-Code automatisiert aufsetzen können,
+**damit** die Umgebung jederzeit reproduzierbar zerstört und neu aufgebaut werden kann, statt alles manuell zu konfigurieren.
+
+**Voraussetzung:** #XX (Docker ist auf dem Server installiert, siehe Story 31)
 
 **Akzeptanzkriterien**
-- [ ] Ein Skript/Playbook (z. B. Ansible, Docker Compose) richtet Container-Laufzeit und Reverse Proxy vollautomatisch ein
+- [ ] Ein Skript/Playbook (z. B. Ansible, Docker Compose) richtet den Reverse Proxy vollautomatisch ein
 - [ ] Die gesamte Konfiguration liegt versioniert im Git-Repository
 - [ ] Nach vollständigem Löschen der Umgebung stellt ein einzelner Befehl sie wieder her
 - [ ] Der Reverse Proxy leitet eine Testanfrage per HTTPS mit gültigem Zertifikat an einen Platzhalterdienst weiter
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
-**Aufwand (T-Shirt-Größe):** L (16 Std.)
+**Aufwand (T-Shirt-Größe):** M (8 Std.)
 
-**Labels:** `user-story`, `lernfeld-LF9`, `fachrichtung-SI`, `size-L`
+**Labels:** `user-story`, `lernfeld-LF9`, `fachrichtung-SI`, `size-M`
 
 ---
 
@@ -375,7 +377,7 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 **möchte ich** mit meinem eigenen Konto Container ohne root-Rechte starten können,
 **damit** ich selbstständig arbeiten kann, ohne Root-Zugriff auf den Server zu erhalten.
 
-**Voraussetzung:** #8 (Docker installiert) und #2 (AE-Konto vorhanden)
+**Voraussetzung:** #XX (Docker installiert, Story 31) und #2 (AE-Konto vorhanden)
 
 **Akzeptanzkriterien**
 - [ ] Rootless Docker ist für das AE-Konto eingerichtet (Einträge in `/etc/subuid` und `/etc/subgid` vorhanden, Setup über `dockerd-rootless-setuptool.sh`)
@@ -662,6 +664,28 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 
 ---
 
+## 31. Docker auf dem Server installieren und einsatzbereit machen
+
+**Als** Systemadministrator
+**möchte ich** Docker (inkl. Docker Compose) auf dem VPS installieren und mit einem Testcontainer prüfen,
+**damit** alle weiteren Dienste (Reverse Proxy, Datenbank, Mailserver, Anwendung) als Container betrieben werden können.
+
+**Voraussetzung:** #2 (persönliche Konten vorhanden) und #3 (Server ist gehärtet)
+
+**Akzeptanzkriterien**
+- [ ] Docker Engine und Docker Compose sind auf dem VPS aus der offiziellen Paketquelle installiert
+- [ ] Ein Testcontainer (z. B. `hello-world`) läuft erfolgreich
+- [ ] Die Installation liegt als Skript versioniert im Git-Repository und ist reproduzierbar ausführbar
+- [ ] Das Vorgehen ist kurz dokumentiert (Version, Installationsschritte)
+
+**Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
+**Bündelungsfach:** Entwicklung vernetzter Prozesse
+**Aufwand (T-Shirt-Größe):** S (4 Std.)
+
+**Labels:** `user-story`, `lernfeld-LF10b`, `fachrichtung-SI`, `size-S`
+
+---
+
 ## Mapping: Story-Nummer (dieses Dokument) ↔ GitHub-Issue-Nummer
 
 | Story | Issue | Story | Issue | Story | Issue |
@@ -676,5 +700,6 @@ stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Da
 | 8 | #12 | 18 | #19 | 28 | #29 |
 | 9 | #13 | 19 | #20 | 29 | #30 |
 | 10 | #14 | 20 | #21 | 30 | #31 |
+| 31 | #XX (nach Anlage eintragen) | | | | |
 
 Hinweis: In den Story-Texten oben stehen Querverweise bereits direkt als `#<Issue-Nummer>`.

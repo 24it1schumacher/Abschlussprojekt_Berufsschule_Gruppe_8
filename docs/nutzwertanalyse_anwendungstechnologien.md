@@ -8,8 +8,6 @@ Der persönliche Lernerfolg ist ein wichtiges Ziel: Nach eigener Angabe wurden i
 
 Das Projekt verlangt einen Browser-Client und laut User Story 5 eine objektorientierte Server-Anwendung. Der Server soll über eine Datenbank-API auf die Datenbank zugreifen; der Client ruft den Server auf. Die konkrete Framework- und Anwendungsstruktur sind laut [app/README.md](../app/README.md) noch offen. Die Bewertungen vergleichen deshalb Programmiersprachen bzw. Laufzeitumgebungen und treffen **keine** Framework-Entscheidung.
 
-**Wichtige Einordnung:** HTML ist keine Programmiersprache, die TypeScript ersetzt. HTML bleibt für die Struktur der Webseiten nötig; CSS gestaltet sie. TypeScript wird zu JavaScript übersetzt und ergänzt JavaScript unter anderem um statische Typen. Die Auswahl TypeScript bedeutet daher nicht, HTML aus dem Projekt auszuschließen. [WHATWG-HTML-Standard](https://html.spec.whatwg.org/) · [TypeScript: Einstieg und Verhältnis zu JavaScript](https://www.typescriptlang.org/docs/handbook/typescript-from-scratch.html)
-
 ## 2. Kriterien, Gewichte und Skala
 
 Die Kriterien und Gewichte wurden vor der Punktevergabe festgelegt. Der persönliche Lerngewinn erhält bewusst ein hohes Gewicht, weil er ausdrücklich Teil des Auftrags ist. Frontend und Backend werden getrennt berechnet: Die Aufgaben und technischen Schnittstellen der beiden Bereiche sind verschieden.

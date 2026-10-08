@@ -8,6 +8,7 @@ Team: 1× Anwendungsentwicklung (AE) + 1× Systemintegration (SI).
 Jeder Abschnitt entspricht einer User Story bzw. einem GitHub Issue.
 Beim Anlegen in GitHub: Überschrift (`##`) als Issue-Titel verwenden, den Rest als
 Issue-Beschreibung übernehmen, Labels wie angegeben setzen.
+Das verbindliche Format und die Prüfpunkte stehen in den [Regeln für User Stories](regeln_user_stories.md).
 
 **Bereits als GitHub-Issues angelegt:** Story 15 (#2), Story 16 (#3), Story 17 (#4).
 `create_github_issues.py` überspringt Titel, die im Repo schon als Issue existieren.
@@ -238,20 +239,21 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
-## 10. Datenbank-Server produktiv bereitstellen
+## 10. PostgreSQL im Docker-Container auf dem VPS bereitstellen
 
-**Als** Systemadministrator
-**möchte ich** den ausgewählten Datenbankserver versioniert und reproduzierbar auf dem Strato-VPS betreiben,
+**Als** Fachinformatiker für Systemintegration (FiSi)
+**möchte ich** PostgreSQL mit Docker Compose versioniert und reproduzierbar auf dem Strato-VPS bereitstellen,
 **damit** die Anwendung eine erreichbare Datenbank mit kontrolliertem Zugriff verwenden kann.
 
-**Voraussetzung:** #13 (Datenbanksystem ist ausgewählt) und #9 (Anwendung kann Datenbankzugriffe testen)
+**Voraussetzung:** #13 (PostgreSQL ist als Datenbanksystem ausgewählt), #34 (Docker ist installiert) und #3 (Server ist gehärtet)
 
 **Akzeptanzkriterien**
-- [ ] Eine festgelegte Version des ausgewählten Datenbanksystems startet mit einem dokumentierten IaC-/Container-Aufruf und verwendet persistenten Speicher
-- [ ] Der Datenbankport ist nur für die Anwendungsdienste bzw. ausdrücklich freigegebene Quellen erreichbar
-- [ ] Zugangsdaten werden außerhalb des Repositorys bereitgestellt; ein Start ohne erforderliche Zugangsdaten schlägt sichtbar fehl
-- [ ] Der Anwendungsserver aus #9 kann über seinen Datenbanktreiber eine Verbindung herstellen und eine Testabfrage ausführen
-- [ ] Das Datenbankschema wird nicht durch den Containerstart oder ein ORM ungefragt erzeugt; Schemaeinrichtung ist als expliziter Schritt dokumentiert
+- [ ] Eine festgelegte PostgreSQL-Image-Version startet über eine versionierte und dokumentierte Docker-Compose-Konfiguration reproduzierbar auf dem VPS
+- [ ] Daten liegen in einem persistenten Docker-Volume und bleiben nach Stoppen, Neuerstellen und erneutem Start des Containers erhalten
+- [ ] PostgreSQL ist nur im internen Anwendungsnetz erreichbar; Port 5432 ist nicht öffentlich freigegeben
+- [ ] Zugangsdaten werden außerhalb des Repositorys sicher bereitgestellt; ohne erforderliche Zugangsdaten startet der Dienst nicht und meldet einen nachvollziehbaren Fehler
+- [ ] Ein Verbindungstest aus dem internen Netz bestätigt, dass PostgreSQL erreichbar ist und eine einfache Abfrage erfolgreich ausgeführt werden kann
+- [ ] Die Anwendungsdatenbank und ihr Schema werden nicht ungefragt durch den Containerstart, ein ORM oder ein anderes Tool angelegt; nötige Einrichtungsschritte sind explizit dokumentiert
 - [ ] Backup und Restore werden in #26 behandelt und sind keine Voraussetzung für diese erste Bereitstellungsscheibe
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)

@@ -73,7 +73,7 @@ def ensure_labels_exist(repo, labels, dry_run):
 def get_existing_titles(repo):
     result = subprocess.run(
         ["gh", "issue", "list", "--repo", repo, "--state", "all", "--limit", "500", "--json", "title"],
-        capture_output=True, text=True,
+        capture_output=True, text=True, encoding="utf-8",  # gh liefert UTF-8, unter Windows sonst cp1252
     )
     if result.returncode != 0:
         return set()
@@ -95,7 +95,7 @@ def create_issue(repo, issue, dry_run, existing_titles):
               f"--label {','.join(issue['labels'])}")
         return
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
     if result.returncode == 0:
         print(f"✔ Issue erstellt: {issue['title']} -> {result.stdout.strip()}")
     else:

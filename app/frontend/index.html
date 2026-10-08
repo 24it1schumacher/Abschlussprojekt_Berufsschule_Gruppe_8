@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Maschinenverleih-Anwendung" />
+    <title>Maschinenverleih</title>
+  </head>
+  <body>
+    <main>
+      <h1>Maschinenverleih</h1>
+      <p id="api-status" role="status">Backend wird geprüft …</p>
+
+      <section aria-labelledby="messages-heading">
+        <h2 id="messages-heading">Testnachrichten</h2>
+        <form id="message-form">
+          <label for="message-text">Nachricht</label>
+          <input id="message-text" name="text" maxlength="500" required />
+          <button type="submit">Speichern</button>
+        </form>
+        <p id="form-status" role="status"></p>
+        <ul id="message-list"></ul>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

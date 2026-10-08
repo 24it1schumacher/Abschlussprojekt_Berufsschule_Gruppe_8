@@ -1,3 +1,16 @@
 # KI-Hilfsdateien (nur lokal, nicht Teil des Projekts)
 CLAUDE.md
 .claude/
+
+# Java / Maven
+**/target/
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/*.tsbuildinfo
+
+# Local environment settings and secrets
+**/.env
+**/.env.*
+!**/.env.example

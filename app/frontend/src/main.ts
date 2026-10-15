@@ -1,4 +1,4 @@
-import { checkHealth, createMessage, getMessages, type Message } from "./api";
+import { checkDatabase, checkHealth, createMessage, getMessages, type Message } from "./api";
 import "./style.css";
 
 const apiStatus = document.querySelector<HTMLParagraphElement>("#api-status");
@@ -30,11 +30,19 @@ async function refreshMessages(): Promise<void> {
 async function initialize(): Promise<void> {
   try {
     await checkHealth();
-    elements.apiStatus.textContent = "Backend ist erreichbar.";
-    await refreshMessages();
+    await checkDatabase();
   } catch {
     elements.apiStatus.textContent =
-      "Backend oder Datenbank ist nicht erreichbar. Prüfe die Startanleitung.";
+      "Backend oder PostgreSQL ist nicht erreichbar. Prüfe Verbindung und Startanleitung.";
+    return;
+  }
+
+  elements.apiStatus.textContent = "Backend und PostgreSQL sind erreichbar.";
+  try {
+    await refreshMessages();
+  } catch {
+    elements.formStatus.textContent =
+      "Verbindung steht, aber Nachrichten konnten nicht geladen werden. Prüfe, ob SQL-Schritt 001 ausgeführt wurde.";
   }
 }
 

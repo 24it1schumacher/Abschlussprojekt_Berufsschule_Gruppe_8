@@ -21,6 +21,23 @@ paths:
                   status:
                     type: string
                     example: ok
+  /api/health/database:
+    get:
+      summary: Führt eine einfache Abfrage zur Prüfung der PostgreSQL-Verbindung aus
+      responses:
+        "200":
+          description: Backend kann die Datenbank erreichen
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+        "503":
+          $ref: "#/components/responses/DatabaseUnavailable"
   /api/messages:
     get:
       summary: Listet gespeicherte Beispielnachrichten

@@ -26,6 +26,10 @@ export function checkHealth(): Promise<{ status: string }> {
   return request("/api/health");
 }
 
+export function checkDatabase(): Promise<{ status: string }> {
+  return request("/api/health/database");
+}
+
 export function getMessages(): Promise<Message[]> {
   return request("/api/messages");
 }

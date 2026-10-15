@@ -18,6 +18,10 @@ Das verbindliche Format und die Prüfpunkte stehen in den [Regeln für User Stor
 Die Story-Nummern 1–32 in dieser Datei sind nur die Reihenfolge in diesem Dokument und
 stimmen NICHT mit den GitHub-Issue-Nummern überein (siehe Mapping-Tabelle am Dateiende).
 
+**Produktneutralität:** Stories nennen keine Produkte, Werkzeuge oder Befehle, sondern
+Fähigkeiten und Ergebnisse. Die Produktwahl steht im [Decision Board](decision_board.md) bzw.
+in der jeweiligen Nutzwertanalyse (Details siehe [Regeln für User Stories](regeln_user_stories.md)).
+
 **Qualitätsmaßstab:** Die Stories sind nach INVEST formuliert: unabhängig (bekannte
 Abhängigkeiten stehen ausdrücklich dabei), verhandelbar, wertvoll, schätzbar, klein
 genug für eine umsetzbare Scheibe und anhand der Akzeptanzkriterien testbar. Größere
@@ -105,10 +109,10 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 **möchte ich** den Reverse Proxy per Infrastructure-as-Code/Configuration-as-Code automatisiert aufsetzen können,
 **damit** die Umgebung jederzeit reproduzierbar zerstört und neu aufgebaut werden kann, statt alles manuell zu konfigurieren.
 
-**Voraussetzung:** #XX (Docker ist auf dem Server installiert, siehe Story 31)
+**Voraussetzung:** #34 (Container-Laufzeitumgebung ist auf dem Server bereitgestellt)
 
 **Akzeptanzkriterien**
-- [ ] Ein Skript/Playbook (z. B. Ansible, Docker Compose) richtet den Reverse Proxy vollautomatisch ein
+- [ ] Ein versioniertes Skript bzw. eine deklarative Konfiguration richtet den Reverse Proxy vollautomatisch ein
 - [ ] Die gesamte Konfiguration liegt versioniert im Git-Repository
 - [ ] Nach vollständigem Löschen der Umgebung stellt ein einzelner Befehl sie wieder her
 - [ ] Der Reverse Proxy leitet eine Testanfrage per HTTPS mit gültigem Zertifikat an einen Platzhalterdienst weiter
@@ -136,7 +140,7 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 - [ ] Datenbank und Schema werden nicht von ORM, Framework oder anderem Tool implizit erzeugt; Einrichtung und Schemaänderung sind explizit nachvollziehbar
 - [ ] Eine einfache Komponenten- oder Deployment-Übersicht zeigt Client, Server, Datenbank-API und Datenbank
 
-**Festgelegte Technologien (01.10.2026):** TypeScript für das Frontend, Java für das Backend und PostgreSQL als Datenbank. Die Frameworks sind noch auszuwählen; die formelle Teamabstimmung ist im [Decision Board](decision_board.md) zu protokollieren.
+**Technologieentscheidungen:** Die gewählten Technologien für Frontend, Backend und Datenbank sowie die noch offene Framework-Auswahl sind im [Decision Board](decision_board.md) festgehalten bzw. dort zu protokollieren. Diese Story nennt bewusst keine Produkte.
 
 **Lernfeld:** LF5 – Software zur Verwaltung von Daten anpassen
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -222,14 +226,14 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 **damit** die technische Grundlage vor der Bereitstellung begründet und im Team nachvollziehbar beschlossen ist.
 
 **Akzeptanzkriterien**
-- [ ] Mindestens PostgreSQL, MariaDB und MySQL werden mit vorab festgelegten Kriterien verglichen; Kriterien und Gewichte ergeben zusammen 100 %
+- [ ] Mindestens drei geeignete Datenbanksysteme (Kandidaten laut Nutzwertanalyse) werden mit vorab festgelegten Kriterien verglichen; Kriterien und Gewichte ergeben zusammen 100 %
 - [ ] Lizenz- und Anschaffungskosten fließen nicht in die Bewertung ein, da für Datenbanksoftware kein Budget vorgesehen ist
 - [ ] Für jedes Kriterium sind Skala, Punkte und gewichteter Beitrag nachvollziehbar dargestellt; die Summen sind rechnerisch korrekt
 - [ ] Die Analyse enthält eine Empfehlung, Einschränkungen und Faktoren, die das Ergebnis ändern könnten
 - [ ] Das Team bestätigt die Auswahl und hält sie in der Analyse oder einem Architecture Decision Record fest
 - [ ] Die Anwendung greift später ausschließlich über eine Datenbank-API auf das ausgewählte System zu; ein Werkzeug darf Datenbank oder Schema nicht ungefragt erzeugen
 
-**Entscheidungsergebnis (01.10.2026):** PostgreSQL wurde als Projektdatenbank festgelegt. Die Bewertung und Begründung stehen in der [Nutzwertanalyse zum Datenbanksystem](nutzwertanalyse_datenbanksystem.md); die formelle Teamabstimmung ist im [Decision Board](decision_board.md) noch zu protokollieren.
+**Entscheidungsergebnis (01.10.2026):** Das Ergebnis, die Bewertung und die Begründung stehen in der [Nutzwertanalyse zum Datenbanksystem](nutzwertanalyse_datenbanksystem.md); die formelle Teamabstimmung ist im [Decision Board](decision_board.md) noch zu protokollieren.
 
 **Lernfeld:** LF9 – Netzwerke und Dienste bereitstellen
 **Bündelungsfach:** Entwicklung vernetzter Prozesse
@@ -239,20 +243,20 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
-## 10. PostgreSQL im Docker-Container auf dem VPS bereitstellen
+## 10. Datenbanksystem containerisiert auf dem VPS bereitstellen
 
 **Als** Fachinformatiker für Systemintegration (FiSi)
-**möchte ich** PostgreSQL mit Docker Compose versioniert und reproduzierbar auf dem Strato-VPS bereitstellen,
+**möchte ich** das ausgewählte Datenbanksystem als Container mit versionierter Konfiguration reproduzierbar auf dem VPS bereitstellen,
 **damit** die Anwendung eine erreichbare Datenbank mit kontrolliertem Zugriff verwenden kann.
 
-**Voraussetzung:** #13 (PostgreSQL ist als Datenbanksystem ausgewählt), #34 (Docker ist installiert) und #3 (Server ist gehärtet)
+**Voraussetzung:** #13 (Datenbanksystem ist ausgewählt), #34 (Container-Laufzeitumgebung ist bereitgestellt) und #3 (Server ist gehärtet)
 
 **Akzeptanzkriterien**
-- [ ] Eine festgelegte PostgreSQL-Image-Version startet über eine versionierte und dokumentierte Docker-Compose-Konfiguration reproduzierbar auf dem VPS
-- [ ] Daten liegen in einem persistenten Docker-Volume und bleiben nach Stoppen, Neuerstellen und erneutem Start des Containers erhalten
-- [ ] PostgreSQL ist nur im internen Anwendungsnetz erreichbar; Port 5432 ist nicht öffentlich freigegeben
+- [ ] Eine festgelegte Version des ausgewählten Datenbanksystems startet als Container über eine versionierte und dokumentierte Konfiguration reproduzierbar auf dem VPS
+- [ ] Daten liegen auf persistentem Speicher außerhalb des Containers und bleiben nach Stoppen, Neuerstellen und erneutem Start des Containers erhalten
+- [ ] Die Datenbank ist nur im internen Anwendungsnetz erreichbar; der Datenbankport ist nicht öffentlich freigegeben (Test von außen schlägt fehl)
 - [ ] Zugangsdaten werden außerhalb des Repositorys sicher bereitgestellt; ohne erforderliche Zugangsdaten startet der Dienst nicht und meldet einen nachvollziehbaren Fehler
-- [ ] Ein Verbindungstest aus dem internen Netz bestätigt, dass PostgreSQL erreichbar ist und eine einfache Abfrage erfolgreich ausgeführt werden kann
+- [ ] Ein Verbindungstest aus dem internen Netz bestätigt, dass die Datenbank erreichbar ist und eine einfache Abfrage erfolgreich ausgeführt werden kann
 - [ ] Die Anwendungsdatenbank und ihr Schema werden nicht ungefragt durch den Containerstart, ein ORM oder ein anderes Tool angelegt; nötige Einrichtungsschritte sind explizit dokumentiert
 - [ ] Backup und Restore werden in #26 behandelt und sind keine Voraussetzung für diese erste Bereitstellungsscheibe
 
@@ -267,11 +271,11 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 ## 11. Mailserver-System kriteriengeleitet auswählen
 
 **Als** Systemadministrator
-**möchte ich** Mailcow, docker-mailserver und Stalwart anhand vorher festgelegter Projektkriterien vergleichen,
+**möchte ich** mehrere geeignete Mailserver-Lösungen anhand vorher festgelegter Projektkriterien vergleichen,
 **damit** das Team eine nachvollziehbare Grundlage für den späteren E-Mail-Versand erhält.
 
 **Akzeptanzkriterien**
-- [ ] Alle drei vorgegebenen Systeme werden mit denselben, vorab festgelegten Kriterien verglichen; Gewichte ergeben 100 %
+- [ ] Mindestens drei geeignete Mailserver-Lösungen (Kandidaten laut Nutzwertanalyse) werden mit denselben, vorab festgelegten Kriterien verglichen; Gewichte ergeben 100 %
 - [ ] Punkte und gewichtete Beiträge sind auf einer einheitlichen Skala angegeben und die Gesamtsummen sind nachgerechnet
 - [ ] Ressourcenbedarf wird mit der tatsächlich verfügbaren VPS-Konfiguration abgeglichen
 - [ ] Die Nutzwertanalyse benennt Empfehlung, wesentliche Risiken und mögliche Gründe für eine andere Wahl
@@ -363,12 +367,12 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 **Akzeptanzkriterien**
 - [ ] Für SI und AE existiert je ein benanntes persönliches Konto; das Verfahren für ein weiteres Konto ist dokumentiert
-- [ ] Jedes Konto akzeptiert seinen eigenen Schlüssel mit mindestens 3072 Bit; auf dem Server liegt nur der öffentliche Schlüssel und die Verzeichnisrechte sind `700`/`600`
-- [ ] SI kann administrative Aufgaben über sudo mit Passwort ausführen; AE ist nicht Mitglied der sudo- oder Docker-Gruppe
+- [ ] Jedes Konto akzeptiert seinen eigenen Schlüssel mit mindestens 3072 Bit; auf dem Server liegt nur der öffentliche Schlüssel und die Rechte der Schlüsselablage sind auf den jeweiligen Kontoinhaber beschränkt (konkrete Werte in der SSH-Anleitung)
+- [ ] SI kann administrative Aufgaben nach erneuter Passwortbestätigung mit erhöhten Rechten ausführen; AE ist nicht Mitglied privilegierter Gruppen (Administrations- und Container-Verwaltungsrechte)
 - [ ] Ein Login-Test mit jedem Konto ist erfolgreich und der verwendete Benutzer ist auf dem Server eindeutig feststellbar
 - [ ] Die SSH-Kurzanleitung nennt Erzeugung, sichere Weitergabe des öffentlichen Schlüssels und Login-Test
 - [ ] Einrichtungsskript bzw. Ablauf enthält keine privaten Schlüssel, Passwörter oder sonstigen Geheimnisse
-- [ ] Rootless Docker und zusätzliche AE-Sudo-Freigaben sind nicht Teil dieser Konten-Story und werden separat umgesetzt
+- [ ] Container-Betrieb ohne administrative Rechte für das AE-Konto (#4) und zusätzliche erhöhte Rechte für AE sind nicht Teil dieser Konten-Story und werden separat umgesetzt
 
 **Lernfeld:** LF11b – Betrieb und Sicherheit vernetzter Systeme gewährleisten (Fachrichtung Systemintegration)
 **Bündelungsfach:** Softwaretechnologie und Datenmanagement
@@ -387,7 +391,7 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 **Voraussetzung:** #2 ist abgeschlossen (Anmeldung mit persönlichen Konten funktioniert)
 
 **Akzeptanzkriterien**
-- [ ] Nach erfolgreichem Test eines sudo-Kontos aus #2 ist Root-SSH-Login gesperrt; `sshd -T` bestätigt die wirksame Einstellung
+- [ ] Nach erfolgreichem Test eines Kontos mit erhöhten Rechten aus #2 ist Root-SSH-Login gesperrt; eine Abfrage der wirksamen Konfiguration bestätigt die Einstellung
 - [ ] SSH-Passwortanmeldung ist deaktiviert und ein Test bestätigt, dass nur vorgesehene Schlüsselkonten zugelassen werden
 - [ ] Firewall-Regeln erlauben nur dokumentierte notwendige Ports; ein Test von außen bestätigt einen nicht benötigten Port als geschlossen
 - [ ] Brute-Force-Schutz und automatische Sicherheitsupdates sind aktiv und ihr Status ist dokumentiert
@@ -402,20 +406,20 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
-## 17. Rootless Docker für das Entwicklerkonto einrichten
+## 17. Container ohne administrative Rechte für das Entwicklerkonto betreiben
 
 **Als** Anwendungsentwickler
-**möchte ich** Container mit meinem Entwicklerkonto im Rootless-Modus starten und stoppen können,
-**damit** ich Entwicklungsdienste betreiben kann, ohne Mitglied der privilegierten Docker-Gruppe zu sein.
+**möchte ich** Container mit meinem Entwicklerkonto ohne administrative Rechte starten und stoppen können,
+**damit** ich Entwicklungsdienste betreiben kann, ohne über die Container-Verwaltung indirekt Administratorrechte auf dem Server zu erhalten.
 
-**Voraussetzung:** #XX (Docker installiert, Story 31) und #2 (AE-Konto vorhanden)
+**Voraussetzung:** #34 (Container-Laufzeitumgebung ist bereitgestellt) und #2 (AE-Konto vorhanden)
 
 **Akzeptanzkriterien**
-- [ ] Das AE-Konto hat gültige Subordinate UID/GID-Bereiche und der Rootless-Docker-Dienst startet ohne Root-Daemon
-- [ ] `docker info` weist Rootless als Sicherheitsoption aus und das AE-Konto ist nicht Mitglied der Gruppe `docker`
-- [ ] Ein Testcontainer kann ohne sudo gestartet, abgefragt und wieder entfernt werden
-- [ ] Nach Abmeldung bleibt der User-Dienst gemäß vereinbarter Konfiguration erreichbar bzw. startet erneut
-- [ ] Falls AppArmor die User-Namespaces blockiert, ist die dokumentierte Profilregel aktiv und ein Testcontainer startet erfolgreich
+- [ ] Die Container des AE-Kontos laufen unter den Rechten dieses Kontos; es gibt keinen administrativen Hintergrunddienst, der stellvertretend für das Konto Container ausführt
+- [ ] Die Laufzeitumgebung weist den eingeschränkten Betriebsmodus nachvollziehbar aus (Nachweis dokumentiert) und das AE-Konto ist nicht Mitglied einer privilegierten Gruppe
+- [ ] Ein Testcontainer kann ohne erhöhte Rechte gestartet, abgefragt und wieder entfernt werden
+- [ ] Nach Abmeldung bleibt der Containerbetrieb gemäß vereinbarter Konfiguration erreichbar bzw. startet erneut
+- [ ] Falls Sicherheitsmechanismen des Betriebssystems den eingeschränkten Betrieb blockieren, ist die dokumentierte Ausnahmeregel aktiv und ein Testcontainer startet erfolgreich
 - [ ] Einrichtungsschritte sind versioniert; Zugangsdaten oder private Schlüssel sind nicht enthalten
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
@@ -727,18 +731,20 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 
 ---
 
-## 31. Docker auf dem Server installieren und einsatzbereit machen
+## 31. Container-Laufzeitumgebung auf dem Server bereitstellen
 
 **Als** Systemadministrator
-**möchte ich** Docker (inkl. Docker Compose) auf dem VPS installieren und mit einem Testcontainer prüfen,
-**damit** alle weiteren Dienste (Reverse Proxy, Datenbank, Mailserver, Anwendung) als Container betrieben werden können.
+**möchte ich** auf dem VPS eine Container-Laufzeitumgebung bereitstellen, in der sich mehrere zusammengehörige Container per Konfigurationsdatei definieren lassen,
+**damit** alle weiteren Dienste (Reverse Proxy, Datenbank, Mailserver, Anwendung) isoliert und reproduzierbar als Container betrieben werden können.
 
 **Voraussetzung:** #2 (persönliche Konten vorhanden) und #3 (Server ist gehärtet)
 
 **Akzeptanzkriterien**
-- [ ] Docker Engine und Docker Compose sind auf dem VPS aus der offiziellen Paketquelle installiert
-- [ ] Ein Testcontainer (z. B. `hello-world`) läuft erfolgreich
+- [ ] Die Container-Laufzeitumgebung ist aus einer offiziellen, vertrauenswürdigen Paketquelle installiert; die Version ist dokumentiert
+- [ ] Mehrere Container lassen sich über eine versionierte Konfigurationsdatei gemeinsam starten und stoppen
+- [ ] Ein Testcontainer läuft erfolgreich und lässt sich rückstandslos entfernen
 - [ ] Die Installation liegt als Skript versioniert im Git-Repository und ist reproduzierbar ausführbar
+- [ ] Die Produktwahl und ihre Begründung sind im [Decision Board](decision_board.md) festgehalten
 - [ ] Das Vorgehen ist kurz dokumentiert (Version, Installationsschritte)
 
 **Lernfeld:** LF10b – Serverdienste bereitstellen und Administrationsaufgaben automatisieren (Fachrichtung Systemintegration)
@@ -752,15 +758,15 @@ nicht automatisch alle für denselben Sprint vorgesehen.
 ## 32. Schnittstellen zwischen Frontend, Backend und Datenbank festlegen
 
 **Als** Anwendungsentwickler
-**möchte ich** die Schnittstellen zwischen TypeScript-Frontend, Java-Backend und PostgreSQL-Datenbank planen und dokumentieren,
+**möchte ich** die Schnittstellen zwischen Frontend, Backend und Datenbank planen und dokumentieren,
 **damit** die Komponenten mit klaren Datenformaten und Verantwortlichkeiten zusammenarbeiten.
 
 **Voraussetzung:** Die Technologiewahl aus #9 (Client-Server-Grundgerüst) und #13 (Datenbanksystem) ist festgehalten.
 
 **Akzeptanzkriterien**
-- [ ] Ein Komponentendiagramm zeigt TypeScript-Frontend → HTTP/JSON-API des Java-Backends → Datenbank-API/Treiber → PostgreSQL; eine direkte Datenbankverbindung aus dem Browser ist ausgeschlossen
+- [ ] Ein Komponentendiagramm zeigt Frontend → HTTP/JSON-API des Backends → Datenbank-API/Treiber → Datenbank; eine direkte Datenbankverbindung aus dem Browser ist ausgeschlossen
 - [ ] Für mindestens einen Beispielablauf sind HTTP-Methode, Route, Anfrage- und Antwortformat sowie relevante Erfolgs- und Fehlercodes dokumentiert
-- [ ] Für den Datenbankzugriff sind der Verantwortungsbereich des Java-Backends, der vorgesehene Treiberzugriff und die Abbildung eines Beispieldatensatzes auf PostgreSQL nachvollziehbar beschrieben
+- [ ] Für den Datenbankzugriff sind der Verantwortungsbereich des Backends, der vorgesehene Treiberzugriff und die Abbildung eines Beispieldatensatzes auf die Datenbank nachvollziehbar beschrieben
 - [ ] Validierungsfehler und Datenbankfehler werden so in API-Antworten übersetzt, dass keine internen Details oder Zugangsdaten offengelegt werden
 - [ ] Offene Punkte und getroffene Schnittstellenentscheidungen sind dokumentiert und mit dem Team abgestimmt
 - [ ] Die Story dokumentiert Schnittstellen und Datenfluss; die Implementierung des lauffähigen Grundgerüsts bleibt in #9

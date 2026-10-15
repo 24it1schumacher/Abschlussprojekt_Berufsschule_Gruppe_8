@@ -15,11 +15,21 @@ Jede Story enthält:
 ## Qualitätsregeln nach INVEST
 
 - **Unabhängig:** Eine Story soll möglichst eigenständig umsetzbar sein. Notwendige Abhängigkeiten werden ausdrücklich benannt.
-- **Verhandelbar:** Die Story beschreibt Ziel und Ergebnis, nicht unnötig jeden technischen Umsetzungsschritt. Verbindliche Projektvorgaben und bereits beschlossene Technologien müssen dennoch eingehalten werden.
+- **Verhandelbar:** Die Story beschreibt Ziel und Ergebnis, nicht unnötig jeden technischen Umsetzungsschritt. Verbindliche Projektvorgaben und bereits beschlossene Technologien müssen dennoch eingehalten werden. Beschlossene Technologien stehen im [Decision Board](decision_board.md), nicht in der Story (siehe Abschnitt „Produktneutralität“).
 - **Wertvoll:** Der Nutzen für eine klar benannte Rolle oder das Projekt ist im „damit“-Teil verständlich.
 - **Schätzbar:** Umfang und Risiken sind klein genug, damit das Team den Aufwand einschätzen kann. Große Vorhaben werden in fachlich sinnvolle erste Schritte geteilt.
 - **Klein:** Eine Story umfasst ein zusammenhängendes Ergebnis, das innerhalb eines passenden Arbeitsabschnitts fertiggestellt werden kann. Andere Rollen oder spätere Ausbaustufen werden nicht beiläufig hineingezogen.
 - **Testbar:** Jedes Akzeptanzkriterium beschreibt ein beobachtbares Ergebnis und vermeidet unklare Aussagen wie „funktioniert gut“ oder „ist benutzerfreundlich“ ohne konkreten Nachweis.
+
+## Produktneutralität
+
+Eine Story beschreibt **was** gebraucht wird und **warum**, nicht **womit** es umgesetzt wird. Die Produktwahl ist eine eigene, begründete Entscheidung und steht im [Decision Board](decision_board.md), in der Nutzwertanalyse oder in einem ADR (Architecture Decision Record).
+
+- Stories nennen keine Produkte, Werkzeuge oder konkreten Befehle. Statt „Docker installieren“ heißt es „Container-Laufzeitumgebung bereitstellen“, statt „PostgreSQL im Docker-Container“ heißt es „Datenbanksystem containerisiert bereitstellen“. Befehle und Einzelschritte gehören in die Anleitungen.
+- Prüffrage: Würden die Akzeptanzkriterien auch mit einem anderen Produkt noch passen? Wenn nein, schreibt die Story ein Produkt vor und wird neutral umformuliert.
+- Eine Story verweist auf die Entscheidung („siehe Decision Board“), statt sie zu wiederholen. So kann sich die Entscheidung ändern, ohne dass alle Stories angepasst werden müssen.
+- Auswahl-Stories (Nutzwertanalysen) nennen keine Kandidaten und kein Ergebnis, sondern fordern „mindestens N geeignete Systeme“. Kandidaten und Ergebnis stehen in der Analyse. Sonst steht die Antwort vor der Frage.
+- Erlaubte Ausnahmen: Standards und Protokolle (z. B. SSH, TLS, HTTP, SPF/DKIM/DMARC, ISO 9241, GoBD, Grundschutz-Bausteine) sowie Vorgaben von außen (z. B. das Dateiformat des Altsystems). Das sind Anforderungen, keine Produktwahl.
 
 ## Rollen und Zuständigkeiten
 
@@ -46,6 +56,7 @@ Jede Story enthält:
 
 - Ist die Rolle klar und passt sie zu Aufgabe und Fachrichtung?
 - Beschreibt die Story ein Ziel und dessen Nutzen?
+- Ist die Story produktneutral (keine Produkte, Werkzeuge oder Befehle außer Standards und Vorgaben von außen)?
 - Sind echte Voraussetzungen verlinkt und sonstige Abhängigkeiten vermieden?
 - Sind alle Kriterien konkret überprüfbar und der Umfang klein genug?
 - Sind Aufwand, Lernfeld, Bündelungsfach und Labels eingetragen?

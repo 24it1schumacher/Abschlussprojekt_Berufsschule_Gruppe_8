@@ -8,6 +8,7 @@
 - Datenbank `maschinenverleih` und Rolle `maschinenverleih_app` müssen bereits angelegt sein. Das Backend darf Tabellen und Datenbank nicht beim Start automatisch erzeugen.
 - In diesem Repository existiert `001_create_app_message.sql` als frühes API-Testbeispiel. Es erstellt nur `app_message`; es ist **nicht** das fachliche Maschinenverleih-Schema.
 - `002_enable_btree_gist.sql` benötigt Rechte zum Installieren der PostgreSQL-Erweiterung. Führe diese eine Datei mit dem Datenbank-Administrator aus. Die übrigen Dateien erstellt die Anwendungsrolle.
+- Schritt `010_user_password_change.sql` ergänzt nach den Fachmigrationen das Feld für den verpflichtenden Wechsel eines temporären Passworts. Er muss vor dem ersten Start der rollenbasierten API ausdrücklich ausgeführt werden.
 - Jede Datei enthält eine Transaktion. Bei einem Fehler bricht `psql` mit `ON_ERROR_STOP` ab. Behebe den Fehler und führe nur die nicht erfolgreich abgeschlossene Datei erneut aus.
 - Niemals echte Passwörter in SQL-Dateien, Git oder Logs schreiben.
 
@@ -71,6 +72,20 @@ psql -h 127.0.0.1 -U maschinenverleih_app -d maschinenverleih -W -v ON_ERROR_STO
 
 ```bash
 psql -h 127.0.0.1 -U maschinenverleih_app -d maschinenverleih -W -v ON_ERROR_STOP=1 -f app/backend/src/main/resources/db/009_suppliers_and_purchase_orders.sql
+```
+
+### 9. Temporäre Passwörter absichern
+
+```bash
+psql -h 127.0.0.1 -U maschinenverleih_app -d maschinenverleih -W -v ON_ERROR_STOP=1 -f app/backend/src/main/resources/db/010_user_password_change.sql
+```
+
+Diese Ergänzung speichert, ob ein Konto sein temporäres Passwort noch ändern muss. Sie ändert keine vorhandenen Passwörter.
+
+Wenn `psql` nur im Docker-Container vorhanden ist, führe den Befehl aus PowerShell im Repository-Stammverzeichnis aus:
+
+```powershell
+Get-Content -Raw app/backend/src/main/resources/db/010_user_password_change.sql | docker exec -i testdocker-postgres-1 psql -U maschinenverleih_app -d maschinenverleih -v ON_ERROR_STOP=1
 ```
 
 ## Kurz prüfen

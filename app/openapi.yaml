@@ -1,86 +1,858 @@
 openapi: 3.0.3
 info:
   title: Maschinenverleih API
-  version: 0.1.0
-  description: Startvertrag für das TypeScript-Frontend und Java-Backend.
+  version: 0.2.0
+  description: >
+    REST-Schnittstelle zwischen TypeScript-Frontend und Java-Backend.
+    Geschützte Endpunkte verwenden eine Sitzung (JSESSIONID) und bei POST/PUT
+    zusätzlich den CSRF-Header X-XSRF-TOKEN. IDs und Felder im Request sind
+    JSON-camelCase.
 servers:
   - url: http://localhost:8080
+security:
+  - SessionCookie: []
 paths:
   /api/health:
     get:
-      summary: Prüft, ob das Backend erreichbar ist
+      security: []
+      summary: Prüft, ob das Backend läuft
       responses:
         "200":
-          description: Backend ist erreichbar
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [status]
-                properties:
-                  status:
-                    type: string
-                    example: ok
+          description: Backend erreichbar
   /api/health/database:
     get:
-      summary: Führt eine einfache Abfrage zur Prüfung der PostgreSQL-Verbindung aus
+      security: []
+      summary: Prüft die Datenbankverbindung mit SELECT 1
       responses:
         "200":
-          description: Backend kann die Datenbank erreichen
+          description: Datenbank erreichbar
+        "503":
+          $ref: "#/components/responses/ServiceUnavailable"
+  /api/auth/csrf:
+    get:
+      security: []
+      summary: Liefert CSRF-Token für schreibende Anfragen
+      responses:
+        "200":
+          description: CSRF-Token
           content:
             application/json:
               schema:
                 type: object
-                required: [status]
+                required: [token]
                 properties:
-                  status:
+                  token:
                     type: string
-                    example: ok
-        "503":
-          $ref: "#/components/responses/DatabaseUnavailable"
-  /api/messages:
-    get:
-      summary: Listet gespeicherte Beispielnachrichten
+  /api/auth/login:
+    post:
+      security:
+        - CsrfHeader: []
+      summary: Meldet einen Benutzer an und startet eine Sitzung
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
       responses:
         "200":
-          description: Nachrichten wurden gelesen
+          description: Angemeldet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/auth/me:
+    get:
+      summary: Gibt das angemeldete Konto zurück
+      responses:
+        "200":
+          description: Konto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /api/auth/logout:
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Beendet die aktuelle Sitzung
+      responses:
+        "204":
+          description: Abgemeldet
+  /api/auth/change-password:
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Ändert das Passwort und beendet danach die Sitzung
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, newPassword]
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+                  minLength: 12
+      responses:
+        "204":
+          description: Passwort geändert
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /api/customers:
+    get:
+      summary: Listet Kunden (Mitarbeiter/Admin)
+      responses:
+        "200":
+          description: Kunden
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Legt einen Kunden an (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerInput"
+      responses:
+        "201":
+          description: Kunde angelegt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/customers/me:
+    get:
+      summary: Liefert ausschließlich den eigenen Kundendatensatz
+      responses:
+        "200":
+          description: Eigener Kundendatensatz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /api/customers/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      summary: Zeigt Kundendetails (Mitarbeiter/Admin)
+      responses:
+        "200":
+          description: Kunde
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Aktualisiert Kundendaten (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CustomerInput"
+      responses:
+        "200":
+          description: Kunde aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/customers/{id}/account:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Erstellt ein Kundenkonto mit temporärem Passwort (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+      responses:
+        "201":
+          description: Konto erstellt; das Passwort muss beim ersten Login geändert werden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedCustomerAccount"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/accounts/employees:
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Erstellt ein Mitarbeiterkonto (nur Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAccountRequest"
+      responses:
+        "201":
+          description: Mitarbeiterkonto erstellt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedEmployeeAccount"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+  /api/machine-types:
+    get:
+      security: []
+      summary: Listet aktive Maschinentypen
+      responses:
+        "200":
+          description: Maschinentypen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MachineType"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Legt einen Maschinentyp an (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineTypeInput"
+      responses:
+        "201":
+          description: Maschinentyp angelegt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MachineType"
+  /api/locations:
+    get:
+      security: []
+      summary: Listet aktive Verleihstandorte
+      responses:
+        "200":
+          description: Standorte
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RentalLocation"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Legt einen Standort an (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RentalLocationInput"
+      responses:
+        "201":
+          description: Standort angelegt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RentalLocation"
+  /api/machines:
+    get:
+      security: []
+      summary: Sucht aktive, mietbare Maschinen
+      parameters:
+        - in: query
+          name: machineTypeId
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: locationId
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: availableFrom
+          description: ISO-8601-Zeitpunkt; nur zusammen mit availableUntil
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: availableUntil
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Maschinenliste (bei keinem Treffer leeres Array)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Machine"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Legt eine Maschine an (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineInput"
+      responses:
+        "201":
+          description: Maschine angelegt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Machine"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/machines/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      security: []
+      summary: Liefert eine Maschine
+      responses:
+        "200":
+          description: Maschine
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Machine"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Aktualisiert eine Maschine (Mitarbeiter/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MachineInput"
+      responses:
+        "200":
+          description: Maschine aktualisiert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Machine"
+  /api/reservations:
+    get:
+      summary: Listet eigene Reservierungen oder alle Reservierungen für Mitarbeiter
+      responses:
+        "200":
+          description: Reservierungen
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Reicht eine Reservierungsanfrage ein
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationInput"
+      responses:
+        "201":
+          description: Reservierung angelegt
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/reservations/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      summary: Liefert eigene Reservierung oder Mitarbeiterdetail
+      responses:
+        "200":
+          description: Reservierung
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/reservations/{id}/confirm:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    post:
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Bestätigt eine Anfrage und legt atomar einen Auftrag an (Mitarbeiter/Admin)
+      responses:
+        "200":
+          description: Bestätigte Reservierung mit Auftrag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /api/rentals:
+    get:
+      summary: Listet eigene Aufträge oder alle Aufträge für Mitarbeiter
+      responses:
+        "200":
+          description: Aufträge
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Rental"
+  /api/rentals/{id}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+    get:
+      summary: Liefert eigenen Auftrag oder Mitarbeiterdetail
+      responses:
+        "200":
+          description: Auftrag
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Rental"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /api/messages:
+    get:
+      summary: Listet gespeicherte technische Beispielnachrichten (angemeldet)
+      responses:
+        "200":
+          description: Nachrichten
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: "#/components/schemas/Message"
-        "503":
-          $ref: "#/components/responses/DatabaseUnavailable"
     post:
-      summary: Speichert eine Beispielnachricht
+      security:
+        - SessionCookie: []
+          CsrfHeader: []
+      summary: Speichert eine technische Beispielnachricht (angemeldet)
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateMessageRequest"
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                  maxLength: 500
       responses:
         "201":
-          description: Nachricht wurde gespeichert
+          description: Nachricht gespeichert
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Message"
         "400":
-          description: Anfrage ist ungültig
-        "503":
-          $ref: "#/components/responses/DatabaseUnavailable"
+          $ref: "#/components/responses/BadRequest"
 components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: JSESSIONID
+    CsrfHeader:
+      type: apiKey
+      in: header
+      name: X-XSRF-TOKEN
+  parameters:
+    Id:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
   schemas:
-    CreateMessageRequest:
+    LoginRequest:
       type: object
-      required: [text]
+      required: [email, password]
       properties:
-        text:
+        email:
           type: string
-          maxLength: 500
-          example: Erste Testnachricht
+          format: email
+        password:
+          type: string
+    UserSession:
+      type: object
+      required: [userId, email, passwordChangeRequired]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+          nullable: true
+        email:
+          type: string
+          format: email
+        passwordChangeRequired:
+          type: boolean
+    CreateAccountRequest:
+      type: object
+      required: [email, temporaryPassword]
+      properties:
+        email:
+          type: string
+          format: email
+        temporaryPassword:
+          type: string
+          minLength: 12
+    CreatedCustomerAccount:
+      type: object
+      required: [userId, customerId, email, role]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [CUSTOMER]
+    CreatedEmployeeAccount:
+      type: object
+      required: [userId, email, role]
+      properties:
+        userId:
+          type: integer
+          format: int64
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [EMPLOYEE]
+    CustomerInput:
+      type: object
+      required: [customerNumber, firstName, lastName, street, postalCode, city, countryCode]
+      properties:
+        customerNumber:
+          type: string
+          maxLength: 30
+        firstName:
+          type: string
+          maxLength: 100
+        lastName:
+          type: string
+          maxLength: 100
+        companyName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          nullable: true
+        phone:
+          type: string
+          nullable: true
+        street:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        countryCode:
+          type: string
+          minLength: 2
+          maxLength: 2
+    Customer:
+      allOf:
+        - $ref: "#/components/schemas/CustomerInput"
+        - type: object
+          required: [id, createdAt, active]
+          properties:
+            id:
+              type: integer
+              format: int64
+            createdAt:
+              type: string
+              format: date-time
+            active:
+              type: boolean
+    MachineTypeInput:
+      type: object
+      required: [name, dailyRentalRate, currencyCode]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        dailyRentalRate:
+          type: number
+          minimum: 0
+        currencyCode:
+          type: string
+          example: EUR
+    MachineType:
+      allOf:
+        - $ref: "#/components/schemas/MachineTypeInput"
+        - type: object
+          required: [id, active]
+          properties:
+            id:
+              type: integer
+              format: int64
+            active:
+              type: boolean
+    RentalLocationInput:
+      type: object
+      required: [code, name, street, postalCode, city, countryCode]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        street:
+          type: string
+        postalCode:
+          type: string
+        city:
+          type: string
+        countryCode:
+          type: string
+    RentalLocation:
+      allOf:
+        - $ref: "#/components/schemas/RentalLocationInput"
+        - type: object
+          required: [id, active]
+          properties:
+            id:
+              type: integer
+              format: int64
+            active:
+              type: boolean
+    MachineInput:
+      type: object
+      required: [machineTypeId, locationId, serialNumber, manufactureYear, operatingHours, conditionCode, active]
+      anyOf:
+        - required: [serviceIntervalHours]
+        - required: [serviceIntervalMonths]
+      properties:
+        machineTypeId:
+          type: integer
+          format: int64
+        locationId:
+          type: integer
+          format: int64
+        serialNumber:
+          type: string
+        manufactureYear:
+          type: integer
+          minimum: 1800
+          maximum: 2200
+        operatingHours:
+          type: number
+          minimum: 0
+        serviceIntervalHours:
+          type: number
+          exclusiveMinimum: true
+          minimum: 0
+          nullable: true
+        serviceIntervalMonths:
+          type: integer
+          minimum: 1
+          nullable: true
+        conditionCode:
+          type: string
+          enum: [GOOD, NEEDS_SERVICE, OUT_OF_SERVICE]
+        active:
+          type: boolean
+    Machine:
+      allOf:
+        - $ref: "#/components/schemas/MachineInput"
+        - type: object
+          required: [id, machineTypeName, dailyRentalRate, currencyCode, locationName, locationCity, createdAt]
+          properties:
+            id:
+              type: integer
+              format: int64
+            machineTypeName:
+              type: string
+            description:
+              type: string
+              nullable: true
+            dailyRentalRate:
+              type: number
+            currencyCode:
+              type: string
+            locationName:
+              type: string
+            locationCity:
+              type: string
+            serviceIntervalHours:
+              type: number
+              nullable: true
+            serviceIntervalMonths:
+              type: integer
+              nullable: true
+            createdAt:
+              type: string
+              format: date-time
+    ReservationInput:
+      type: object
+      required: [machineId, startAt, endAt]
+      properties:
+        machineId:
+          type: integer
+          format: int64
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        customerId:
+          type: integer
+          format: int64
+          description: Nur Mitarbeiter dürfen dieses Feld setzen.
+    Reservation:
+      type: object
+      required: [id, customerId, machineId, machineTypeName, serialNumber, startAt, endAt, status, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        machineId:
+          type: integer
+          format: int64
+        machineTypeName:
+          type: string
+        serialNumber:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        rentalId:
+          type: integer
+          format: int64
+          nullable: true
+        orderNumber:
+          type: string
+          nullable: true
+        rentalStatus:
+          type: string
+          nullable: true
+    Rental:
+      type: object
+      required: [id, reservationId, customerId, orderNumber, status, machineTypeName, serialNumber, startAt, endAt, createdAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        reservationId:
+          type: integer
+          format: int64
+        customerId:
+          type: integer
+          format: int64
+        orderNumber:
+          type: string
+        status:
+          type: string
+        machineTypeName:
+          type: string
+        serialNumber:
+          type: string
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
     Message:
       type: object
       required: [id, text, createdAt]
@@ -93,15 +865,50 @@ components:
         createdAt:
           type: string
           format: date-time
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: string
   responses:
-    DatabaseUnavailable:
-      description: Datenbank ist nicht verfügbar oder nicht vorbereitet
+    BadRequest:
+      description: Ungültige Eingabe
       content:
         application/json:
           schema:
-            type: object
-            required: [error]
-            properties:
-              error:
-                type: string
-                example: Datenbank ist vorübergehend nicht verfügbar.
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Anmeldung erforderlich oder Zugangsdaten ungültig
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Forbidden:
+      description: Rolle darf diese Aktion nicht ausführen
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Datensatz wurde nicht gefunden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Conflict:
+      description: Konflikt mit vorhandenen Daten oder einer Reservierung
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServiceUnavailable:
+      description: Datenbank nicht verfügbar
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

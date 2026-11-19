@@ -11,7 +11,33 @@
       <h1>Maschinenverleih</h1>
       <p id="api-status" role="status">Backend wird geprüft …</p>
 
-      <section aria-labelledby="messages-heading">
+      <section id="login-section" aria-labelledby="login-heading">
+        <h2 id="login-heading">Anmelden</h2>
+        <form id="login-form">
+          <label for="login-email">E-Mail</label>
+          <input id="login-email" name="email" type="email" autocomplete="username" required />
+          <label for="login-password">Passwort</label>
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Anmelden</button>
+        </form>
+        <p id="login-status" role="status"></p>
+      </section>
+
+      <section id="password-section" aria-labelledby="password-heading" hidden>
+        <h2 id="password-heading">Temporäres Passwort ändern</h2>
+        <form id="password-form">
+          <label for="current-password">Aktuelles Passwort</label>
+          <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required />
+          <label for="new-password">Neues Passwort (mindestens 12 Zeichen)</label>
+          <input id="new-password" name="newPassword" type="password" minlength="12" autocomplete="new-password" required />
+          <button type="submit">Passwort ändern</button>
+        </form>
+        <p id="password-status" role="status"></p>
+      </section>
+
+      <button id="logout-button" type="button" hidden>Abmelden</button>
+
+      <section id="messages-section" aria-labelledby="messages-heading" hidden>
         <h2 id="messages-heading">Testnachrichten</h2>
         <form id="message-form">
           <label for="message-text">Nachricht</label>

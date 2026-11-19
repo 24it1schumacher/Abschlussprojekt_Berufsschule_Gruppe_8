@@ -31,6 +31,9 @@ Vor dem Start des Backends PostgreSQL-Zugangsdaten als Umgebungsvariablen der Ru
 | `DB_USERNAME` | `maschinenverleih_app` |
 | `DB_PASSWORD` | Lokal gesetztes Passwort, niemals ins Repository committen |
 | `FRONTEND_ORIGIN` | `http://localhost:5173` |
+| `BOOTSTRAP_ADMIN_EMAIL` | Nur einmalig beim ersten Erstellen des Admin-Kontos |
+| `BOOTSTRAP_ADMIN_PASSWORD` | Nur einmalig; mindestens 12 Zeichen |
+| `COOKIE_SECURE` | In lokaler HTTP-Entwicklung `false`; bei HTTPS in Produktion `true` |
 
 Für eine PowerShell-Sitzung können die Werte so gesetzt werden (Passwort durch euer lokales Passwort ersetzen):
 
@@ -132,15 +135,33 @@ Get-Content -Raw backend/src/main/resources/db/001_create_app_message.sql | dock
 
 Diese Tabelle ist nur für den technischen API-Test bestimmt, nicht das fachliche Datenbankschema. Das vollständige, aus ERD und User Stories abgeleitete Schema liegt in den nummerierten SQL-Schritten unter [`db`](backend/src/main/resources/db/) und wird in [PostgreSQL-Datenbankschema](../docs/datenbankmodell_postgresql.md) Schritt für Schritt erklärt. Die lokale Compose-Datei ist für Entwicklung gedacht. Die versionsfeste und abgesicherte VPS-Bereitstellung gehört zur FiSi-Story in [User Stories](../docs/user_stories.md).
 
+## Kern-API und erste Anmeldung
+
+Die API kann Kunden, Konten, Maschinentypen, Standorte und Maschinen verwalten. Kunden können nach verfügbaren Maschinen suchen und Reservierungsanfragen stellen. Ein Mitarbeiter kann eine Anfrage bestätigen; dabei werden Reservierung, eindeutige Auftragsnummer und unveränderbarer Audit-Eintrag gemeinsam gespeichert. Kunden sehen über ihre Anmeldung nur ihre eigenen Reservierungen und Aufträge. Eine bestätigte Reservierung erzeugt genau einen Auftrag.
+
+Vor dem ersten Start mit der neuen API müssen die nummerierten SQL-Schritte 003 bis 010 in Reihenfolge ausgeführt sein. Schritt 010 ergänzt das Feld für den Passwortwechsel; das Backend führt diese Dateien absichtlich **nicht** automatisch aus.
+
+Falls 003 bis 009 bereits ausgeführt wurden, Schritt 010 einmalig aus dem Repository-Stammverzeichnis in PowerShell starten:
+
+```powershell
+Get-Content -Raw .\app\backend\src\main\resources\db\010_user_password_change.sql | docker exec -i testdocker-postgres-1 psql -U maschinenverleih_app -d maschinenverleih -v ON_ERROR_STOP=1
+```
+
+Für das einmalige erste Administratorkonto die Variablen `BOOTSTRAP_ADMIN_EMAIL` und `BOOTSTRAP_ADMIN_PASSWORD` in der IntelliJ-Run-Konfiguration setzen. Das Passwort muss mindestens 12 Zeichen lang sein. Beim Backendstart wird das Konto nur angelegt, wenn diese E-Mail noch nicht existiert; ein vorhandenes Passwort wird nicht überschrieben. Nach erfolgreicher Anlage die Bootstrap-Variablen wieder aus der Run-Konfiguration entfernen. Beim ersten Login muss das initiale Passwort geändert werden.
+
+Ein Administrator legt Mitarbeiterkonten an. Mitarbeiter legen Kunden und zugehörige Kundenkonten an; für diese Konten wird ein temporäres Passwort vergeben, das beim ersten Login geändert werden muss. Passwörter werden mit PBKDF2 gehasht, Sitzungen verwenden ein HTTP-only-Cookie und schreibende API-Aufrufe werden mit CSRF-Token geschützt. Die Entwicklungs-API ist kein produktionsreifes Authentifizierungs- oder Compliance-System; vor einem öffentlichen Betrieb sind unter anderem HTTPS, Betriebs-/Sicherheitsprüfung und weitere Anforderungen umzusetzen.
+
+Die REST-Schnittstelle ist in [`openapi.yaml`](openapi.yaml) beschrieben. Die TypeScript-Funktionen und Datentypen für Anmeldung, Kunden, Maschinen, Reservierungen und Aufträge liegen in `frontend/src/api.ts`. Vite sendet Sitzungs-Cookies mit und holt für schreibende Anfragen ein CSRF-Token.
+
 ## Aktueller Beispielablauf
 
 - `GET http://localhost:8080/api/health` prüft, ob das Backend antwortet.
 - `GET http://localhost:8080/api/health/database` führt `SELECT 1` gegen PostgreSQL aus.
-- `GET http://localhost:8080/api/messages` listet gespeicherte Beispielnachrichten.
-- `POST http://localhost:8080/api/messages` legt eine Nachricht an. Der Request enthält JSON wie `{"text":"Erste Testnachricht"}`.
-- Die TypeScript-Oberfläche ruft die Nachrichten-API auf und zeigt die Ergebnisse an.
+- Nach der Anmeldung listet `GET http://localhost:8080/api/messages` gespeicherte Testnachrichten.
+- `POST http://localhost:8080/api/messages` legt eine Testnachricht an. Der Request enthält JSON wie `{"text":"Erste Testnachricht"}`.
+- Die Beispieloberfläche bietet Anmeldung, Passwortwechsel und Abmeldung. Die übrigen Fach-API-Funktionen werden über den TypeScript-API-Client aufgerufen; vollständige Verwaltungsformulare sind noch nicht umgesetzt.
 - Die vollständigen Schnittstellen sind in [`openapi.yaml`](openapi.yaml) dokumentiert.
 
 Der Browser spricht ausschließlich mit dem Java-Backend. Nur das Backend erhält PostgreSQL-Zugangsdaten und greift mit JDBC auf die Datenbank zu.
 
-Das Grundgerüst ist noch nicht produktionsreif: insbesondere vollständige Anmeldung und Berechtigungsprüfung, Backups und Produktionskonfiguration müssen in den dafür vorgesehenen Stories ergänzt werden. Den Entwicklungsserver und die Beispiel-API nicht ungeschützt öffentlich bereitstellen.
+Der aktuelle Backend-Ausbau deckt den Startablauf für Kunden, Maschinen, Reservierungen, Aufträge und Rollen ab. Wartungshistorie/Statusberechnung, Stornoregeln, Excel-Import, Rechnungen, Zahlungen und Shop sind noch nicht als Anwendungsfunktionen umgesetzt. Das System ist noch nicht produktionsreif: Backups, Betriebsabsicherung, HTTPS-Konfiguration und eine fachliche Prüfung der Datenschutz-/Rechnungsanforderungen bleiben notwendig. Den Entwicklungsserver und die Beispiel-API nicht ungeschützt öffentlich bereitstellen.

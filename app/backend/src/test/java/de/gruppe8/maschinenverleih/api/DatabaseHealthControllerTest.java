@@ -14,9 +14,11 @@ import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import de.gruppe8.maschinenverleih.security.DatabaseUserDetailsService;
+import de.gruppe8.maschinenverleih.security.SecurityConfiguration;
 
 @WebMvcTest(DatabaseHealthController.class)
-@Import(ApiExceptionHandler.class)
+@Import({ApiExceptionHandler.class, SecurityConfiguration.class})
 class DatabaseHealthControllerTest {
 
     @Autowired
@@ -24,6 +26,9 @@ class DatabaseHealthControllerTest {
 
     @MockitoBean
     private JdbcTemplate jdbcTemplate;
+
+    @MockitoBean
+    private DatabaseUserDetailsService userDetailsService;
 
     @Test
     void databaseHealthRunsQueryAndReportsSuccess() throws Exception {

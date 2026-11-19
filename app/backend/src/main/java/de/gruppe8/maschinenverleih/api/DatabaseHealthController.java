@@ -1,12 +1,10 @@
 package de.gruppe8.maschinenverleih.api;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins = "${app.frontend-origin:http://localhost:5173}")
 public class DatabaseHealthController {
 
     private final JdbcTemplate jdbcTemplate;

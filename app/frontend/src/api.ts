@@ -10,12 +10,6 @@ export interface UserSession {
   passwordChangeRequired: boolean;
 }
 
-export interface Message {
-  id: number;
-  text: string;
-  createdAt: string;
-}
-
 export interface Customer {
   id: number;
   customerNumber: string;
@@ -224,17 +218,6 @@ export function changePassword(currentPassword: string, newPassword: string): Pr
   return request("/api/auth/change-password", {
     method: "POST",
     body: JSON.stringify({ currentPassword, newPassword }),
-  });
-}
-
-export function getMessages(): Promise<Message[]> {
-  return request("/api/messages");
-}
-
-export function createMessage(text: string): Promise<Message> {
-  return request("/api/messages", {
-    method: "POST",
-    body: JSON.stringify({ text }),
   });
 }
 

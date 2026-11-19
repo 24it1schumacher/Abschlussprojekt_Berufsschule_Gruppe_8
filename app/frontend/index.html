@@ -11,6 +11,12 @@
       <h1>Maschinenverleih</h1>
       <p id="api-status" role="status">Backend wird geprüft …</p>
 
+      <section id="catalog-section" aria-labelledby="catalog-heading">
+        <h2 id="catalog-heading">Mietbare Maschinen</h2>
+        <p id="catalog-status" role="status">Maschinen werden geladen …</p>
+        <ul id="machine-list"></ul>
+      </section>
+
       <section id="login-section" aria-labelledby="login-heading">
         <h2 id="login-heading">Anmelden</h2>
         <form id="login-form">
@@ -37,15 +43,13 @@
 
       <button id="logout-button" type="button" hidden>Abmelden</button>
 
-      <section id="messages-section" aria-labelledby="messages-heading" hidden>
-        <h2 id="messages-heading">Testnachrichten</h2>
-        <form id="message-form">
-          <label for="message-text">Nachricht</label>
-          <input id="message-text" name="text" maxlength="500" required />
-          <button type="submit">Speichern</button>
-        </form>
-        <p id="form-status" role="status"></p>
-        <ul id="message-list"></ul>
+      <section id="account-section" aria-labelledby="account-heading" hidden>
+        <h2 id="account-heading">Mein Bereich</h2>
+        <h3>Reservierungen</h3>
+        <ul id="reservation-list"></ul>
+        <h3>Aufträge</h3>
+        <ul id="rental-list"></ul>
+        <p id="account-status" role="status"></p>
       </section>
     </main>
     <script type="module" src="/src/main.ts"></script>

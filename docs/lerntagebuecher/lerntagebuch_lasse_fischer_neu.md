@@ -236,3 +236,24 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 - KI-Einsatz: Claude hat Skripte und Tests gebaut; zwei Fehler (404, Ausführungsrecht) habe ich auf dem Server selbst entdeckt und zurückgemeldet.
 
 ---
+
+## 25.11.2026 · Präsentation und Spickzettel für das Fachgespräch erstellen
+
+### Problem
+
+- Im Review #1 waren die Folien zu dünn (Note 5 für die Präsentation): zu wenig Einblick, keine Konfigurationen und Logs.
+- Ich muss alles, was heute entstanden ist, in 5 Minuten zeigen und im Fachgespräch erklären können.
+
+### Lösung
+
+- Präsentation `docs/praesentation/Fachgespraech_Lasse_Fischer_2026-11-26.pptx`: 10 Vortragsfolien mit echten Screenshots vom Server (Protokoll des automatischen Rollouts, Test von außen, Zertifikat, GitHub Actions) und 5 Backup-Folien (Docker und ufw, Entscheidungen mit Alternativen, mögliche Fragen).
+- Zu jeder Folie Sprechernotizen mit Zeitangabe, Formulierung und Hintergrund für Rückfragen.
+- Spickzettel `docs/praesentation/fachgespraech_spickzettel.md` mit Begriffen, Befehlen und Antworten.
+- KI-Einsatz: Claude hat Folien und Notizen erstellt; Inhalte stammen aus der heutigen Arbeit und den echten Nachweisen.
+
+### Lessons Learned
+
+- Nachweise laufend sammeln statt am Ende: Die Bilder waren schon da, die Präsentation war dadurch schnell gebaut.
+- Jede Folie braucht echtes Material (Konfiguration, Log, Messwert), nicht nur Stichpunkte.
+
+---

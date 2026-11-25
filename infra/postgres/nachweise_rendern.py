@@ -55,6 +55,19 @@ META = {
         (r'\{"status":"ok"\}', "ok"), (r"<title>", "ok"), (r"^(X-|Referrer|Permissions)", "ok")]),
     "24_netztrennung": ("Netztrennung: Webserver erreicht die Datenbank nicht", [
         (r'\{"status":"ok"\}', "ok"), (r"bad address", "block"), (r"Exit-Code: 1", "block"), (r"erreichbar", "ok"), (r"^maschinenverleih-(web|db)-intern:", "id")]),
+    # VPS: automatisches Deployment
+    "30_auto_deploy": ("Automatisch ausgerollt: CI grün → Server übernimmt selbst", [
+        (r"ausstehend", "id"), (r"Rolle .* -> ", "ok"), (r"Fertig: ", "ok"), (r"success", "ok")]),
+    "31_timer": ("systemd-Timer mit eigenem Systembenutzer", [
+        (r"maschinenverleih-deploy\.timer", "ok"), (r"Result=success", "ok"), (r"ProtectSystem=strict", "ok"),
+        (r"NoNewPrivileges=yes", "ok"), (r"nologin", "ok")]),
+    "32_ports_server": ("Offene Ports auf dem Server", [
+        (r"^0\.0\.0\.0:(22|80|443)$", "ok"), (r"^127\.0\.0\.1:5432$", "id")]),
+    "33_von_aussen": ("Test von außen: nur HTTPS, interne Ports zu", [
+        (r"308", "ok"), (r"HTTPS -> 200", "ok"), (r'\{"status":"ok"\}', "ok"), (r"^Strict-Transport", "ok"),
+        (r"keine Verbindung", "block")]),
+    "34_zertifikat": ("Automatisch ausgestelltes TLS-Zertifikat", [
+        (r"Let's Encrypt", "ok"), (r"notAfter", "id")]),
     "25_container_haertung": ("Container ohne Root und mit schreibgeschütztem Dateisystem", [
         (r"uid=1000", "ok"), (r"Read-only file system", "block"), (r"Exit-Code: 1", "block"), (r"ReadOnly=true", "ok")]),
 }

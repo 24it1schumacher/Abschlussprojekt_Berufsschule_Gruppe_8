@@ -17,3 +17,4 @@ CLAUDE.md
 
 # Rohdaten der Nachweis-Skripte (vor dem Schwaerzen pruefen)
 infra/postgres/nachweise_vps/
+infra/deploy/shots/

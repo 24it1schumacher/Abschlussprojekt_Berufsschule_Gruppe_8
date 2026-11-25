@@ -4,15 +4,17 @@
 #   /api/*  -> Backend-Container (Spring Boot, Port 8080, nur im internen Netz erreichbar)
 #   alles andere -> gebautes Frontend aus /srv
 #
-# ":80" = reines HTTP. Fuer den VPS mit Domain wird hier spaeter der Domainname eingetragen,
-# dann holt Caddy das TLS-Zertifikat automatisch (Story 14 / Issue #18).
+# SITE_ADDRESS (aus infra/stack/.env):
+#   ":80"              lokal, reines HTTP
+#   "<hostname>"       auf dem Server: Caddy holt automatisch ein TLS-Zertifikat (Let's Encrypt),
+#                      leitet HTTP auf HTTPS um und erneuert das Zertifikat selbst (Issue #18)
 
 {
-	# Keine Admin-Schnittstelle nach aussen; Konfiguration kommt nur aus dieser Datei
+	# Keine Admin-Schnittstelle; Konfiguration kommt nur aus dieser Datei
 	admin off
 }
 
-:80 {
+{$SITE_ADDRESS::80} {
 	encode zstd gzip
 
 	handle /api/* {
@@ -30,6 +32,8 @@
 		X-Frame-Options "DENY"
 		Referrer-Policy "same-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# Browser merkt sich: nur noch HTTPS (wird ueber reines HTTP vom Browser ignoriert)
+		Strict-Transport-Security "max-age=31536000"
 		# Versionsangabe des Webservers nicht verraten
 		-Server
 	}

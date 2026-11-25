@@ -49,9 +49,14 @@ services:
     build: ../../app/frontend
     image: maschinenverleih-web:0.1.0
     restart: unless-stopped
+    environment:
+      # Lokal ":80" (HTTP). Auf dem Server ein Hostname: Caddy holt dann automatisch ein TLS-Zertifikat.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
     ports:
-      # Lokal nur auf dem eigenen Rechner. Auf dem VPS in .env: WEB_BIND=0.0.0.0:80
+      # Lokal nur auf dem eigenen Rechner. Auf dem Server (.env): WEB_BIND=0.0.0.0:80, WEB_TLS_BIND=0.0.0.0:443
+      # Port 80 bleibt auf dem Server noetig: Zertifikatspruefung (ACME) und Umleitung auf HTTPS.
       - "${WEB_BIND:-127.0.0.1:8080}:80"
+      - "${WEB_TLS_BIND:-127.0.0.1:8443}:443"
     volumes:
       - ../proxy/Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data

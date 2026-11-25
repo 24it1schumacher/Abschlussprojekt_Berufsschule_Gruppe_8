@@ -122,8 +122,9 @@ done
 # --wait:  wartet, bis die Healthchecks gruen sind.
 compose up -d --build --remove-orphans --wait --wait-timeout 300 || rollback
 
-# Abschlusspruefung durch den Webserver hindurch
-curl -fsS --max-time 10 "http://127.0.0.1:${WEB_PORT_CHECK:-80}/api/health/database" > /dev/null || rollback
+# Abschlusspruefung aus dem Webserver-Container: web -> backend -> datenbank
+# (unabhaengig davon, ob das TLS-Zertifikat schon ausgestellt ist)
+compose exec -T web wget -qO- -T 10 http://backend:8080/api/health/database > /dev/null || rollback
 
 docker image prune -f > /dev/null
 rm -f "$STATE_DIR/failed"

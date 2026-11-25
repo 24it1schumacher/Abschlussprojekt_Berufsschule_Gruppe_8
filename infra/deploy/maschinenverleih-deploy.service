@@ -13,7 +13,7 @@ SupplementaryGroups=docker
 StateDirectory=maschinenverleih-deploy
 # Status und Protokoll fuer alle Teammitglieder lesbar (enthalten keine Geheimnisse)
 StateDirectoryMode=0755
-ExecStart=/srv/maschinenverleih/infra/deploy/auto-update.sh
+ExecStart=/bin/bash /srv/maschinenverleih/infra/deploy/auto-update.sh
 TimeoutStartSec=20min
 # Haertung: Der Dienst darf nur das Repository und sein Statusverzeichnis beschreiben
 NoNewPrivileges=yes

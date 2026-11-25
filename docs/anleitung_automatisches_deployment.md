@@ -39,21 +39,34 @@ Version auf dem Server. Niemand muss sich dafür auf dem Server anmelden.
 | Fehlerfall | Rollback auf vorherigen Commit, fehlerhafter Commit wird gemerkt | Die Anwendung bleibt erreichbar; kein Endlos-Wiederholen | Manuell eingreifen |
 | Rechte | Eigener Systembenutzer ohne Login, nur Gruppe `docker` | Kein persönliches Konto, kein sudo; systemd-Härtung (`ProtectSystem=strict`, `NoNewPrivileges`) | Als root (zu viele Rechte) |
 
-**Grenze:** Die Gruppe `docker` ist praktisch root-gleich. Ein Angreifer, der den Deploy-Benutzer
-übernimmt, hätte damit volle Kontrolle. Ausbaustufe: Rootless Docker (Story 17 / #4).
+## 3. Sicherheit
 
-## 3. Einmalige Einrichtung (nur mit sudo möglich)
+| Punkt | Bewertung |
+|---|---|
+| Ports nach außen | 22 (SSH, nur Schlüssel), 80 und 443. Datenbank und Backend haben keinen öffentlichen Port. |
+| Port 80 | Nur für die Zertifikatsprüfung von Let's Encrypt (ACME HTTP-01) und die automatische Umleitung auf HTTPS. Über Port 80 werden keine Anmeldedaten übertragen. |
+| HTTPS | Caddy holt und erneuert das Zertifikat selbst. Ohne eigene Domain wird `<ip>.sslip.io` verwendet (öffentlicher DNS-Dienst, der den Namen auf die IP abbildet). Mit eigener Domain: 3. Argument von `install.sh`. |
+| Cookies | `COOKIE_SECURE=true`: Das Session-Cookie wird nur über HTTPS gesendet; dazu HSTS-Header. |
+| ufw und Docker | Docker veröffentlicht Ports an ufw vorbei (eigene iptables-Regeln). Die ufw-Regeln für 80/443 dokumentieren die Freigabe; die tatsächliche Freigabe steuert `ports:` in `infra/stack/compose.yaml`. |
+| Deploy-Benutzer | Ohne Login-Shell und ohne sudo, aber in der Gruppe `docker` und damit praktisch root-gleich. |
+| Wer kann Code auf den Server bringen? | Jeder, der nach `main` mergen darf, und die CI muss grün sein. Deshalb: Branch Protection mit Pflicht-Review und 2-Faktor-Anmeldung für alle GitHub-Konten. |
+
+**Grenzen:** Rootless Docker (Story 17 / #4) würde die root-Gleichheit beseitigen. Ohne
+Branch Protection könnte ein übernommenes GitHub-Konto Code auf den Server bringen.
+
+## 4. Einmalige Einrichtung (nur mit sudo möglich)
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/24it1schumacher/Abschlussprojekt_Berufsschule_Gruppe_8/main/infra/deploy/install.sh
-less install.sh                       # vor dem Ausführen lesen
-sudo bash install.sh <admin-email>    # optional als 2. Argument ein anderer Branch
+less install.sh                                     # vor dem Ausführen lesen
+sudo bash install.sh <admin-email> [branch] [hostname]
 ```
 
-Das Skript erzeugt alle Passwörter selbst, legt Datenbank und Rolle an, gibt Port 80 frei, rollt
-die erste Version aus und zeigt **einmalig** das Startpasswort des Admin-Kontos an.
+Das Skript erzeugt alle Passwörter selbst, legt Datenbank und Rolle an, gibt 80/443 frei, rollt
+die erste Version aus und zeigt **einmalig** das Startpasswort des Admin-Kontos an. Es kann nach
+einem Abbruch erneut gestartet werden, ohne Passwörter zu überschreiben.
 
-## 4. Betrieb
+## 5. Betrieb
 
 | Frage | Befehl |
 |---|---|
@@ -64,24 +77,27 @@ die erste Version aus und zeigt **einmalig** das Startpasswort des Admin-Kontos 
 | Automatik anhalten | `sudo systemctl stop maschinenverleih-deploy.timer` |
 | Gescheiterten Commit erneut versuchen | `sudo rm /var/lib/maschinenverleih-deploy/failed` |
 
-## 5. Regeln für das Team
+## 6. Regeln für das Team
 
 - Änderungen nur per Pull Request nach `main`; dort zeigt GitHub die drei Prüfungen an.
 - Neue Datenbankänderung = neue Datei mit der nächsten Nummer (z. B. `011_...sql`), eigene Transaktion (`BEGIN; … COMMIT;`). Vorhandene Dateien nie ändern – sie wurden schon ausgeführt.
 - Geheimnisse nie ins Repository; sie liegen nur auf dem Server in `infra/postgres/.env` und `infra/stack/.env`.
 - Empfohlen (Einstellung nur durch den Repository-Besitzer): Branch Protection für `main` mit den drei Prüfungen als Pflicht.
 
-## 6. Getestet (25.11.2026)
+## 7. Getestet (25.11.2026)
 
 | Test | Ergebnis |
 |---|---|
 | CI auf GitHub | Erster Lauf rot: shellcheck fand ein fehlendes `|| exit` nach `cd` in einem Skript. Nach der Korrektur alle drei Prüfungen grün. |
 | `auto-update.sh` echt unter Ubuntu 24.04 (WSL, Docker 29.1.3) | CI-Status über die GitHub-API gelesen, SQL 002–010 eingespielt und in `deploy_schema_history` mit Commit vermerkt, Images gebaut (Tests grün), Health-Check über den Webserver erfolgreich, Admin-Konto angelegt |
 | Zweiter Lauf ohne neuen Commit | Beendet sich sofort ohne Änderung |
+| Erster Server-Lauf | Abbruch mit `Permission denied`: Skripte waren im Repository nicht ausführbar (Git unter Windows speichert das Ausführungsrecht nicht). Der WSL-Test hatte das Skript mit `bash` gestartet und den Fehler deshalb nicht gezeigt. Behoben: Ausführungsrecht in Git gesetzt, systemd ruft über `bash` auf. |
+| `install.sh` komplett als root in WSL (Ubuntu 24.04, systemd) | Benutzer, Klon, Passwörter, Datenbank, SQL 002–010, Bau, Start, Admin-Konto: erfolgreich. Gefunden: Timer startete nicht (`Requires=docker.service` existiert unter Docker Desktop nicht). Behoben. |
+| Automatisches Ausrollen | Commit `1ea6318` gepusht → CI grün um 21:42:14 → Timer hat um 21:42:16 selbst ausgerollt |
 | Rollback | Noch nicht praktisch ausgelöst |
 
-## 7. Grenzen
+## 8. Grenzen
 
 - SQL-Schritte werden beim Rollback nicht zurückgenommen; Datenbankänderungen müssen abwärtskompatibel sein.
 - Kein Backup vor dem Deployment (Story 25 / #26).
-- Noch kein HTTPS (#18) und keine Benachrichtigung bei Fehlern (nur Protokoll auf dem Server).
+- Keine Benachrichtigung bei Fehlern (nur Protokoll auf dem Server).

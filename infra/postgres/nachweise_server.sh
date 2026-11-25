@@ -14,7 +14,7 @@
 # Es loescht nie das Volume und legt keine Rollen oder Datenbanken an.
 
 set -u
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit 1
 
 if [ ! -f .env ] || [ ! -f compose.yaml ]; then
   echo "Bitte im Ordner mit compose.yaml und .env starten." >&2; exit 1

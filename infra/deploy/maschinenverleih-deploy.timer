@@ -2,9 +2,10 @@
 Description=Maschinenverleih: alle 2 Minuten auf neue Version pruefen
 
 [Timer]
-OnBootSec=2min
-OnUnitInactiveSec=2min
-Persistent=true
+# Feste Uhrzeiten (:00, :02, :04 ...). Laeuft ein Durchlauf noch, wird der naechste ausgelassen.
+OnCalendar=*:0/2
+RandomizedDelaySec=15
+AccuracySec=10s
 
 [Install]
 WantedBy=timers.target

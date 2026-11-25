@@ -2,8 +2,7 @@
 Description=Maschinenverleih: neuen Stand von GitHub pruefen und ausrollen
 Documentation=file:///srv/maschinenverleih/docs/anleitung_automatisches_deployment.md
 After=network-online.target docker.service
-Wants=network-online.target
-Requires=docker.service
+Wants=network-online.target docker.service
 
 [Service]
 Type=oneshot

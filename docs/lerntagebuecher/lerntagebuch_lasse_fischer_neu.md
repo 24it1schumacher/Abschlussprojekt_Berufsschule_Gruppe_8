@@ -257,3 +257,25 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 - Jede Folie braucht echtes Material (Konfiguration, Log, Messwert), nicht nur Stichpunkte.
 
 ---
+
+## 25.11.2026 · Präsentation auf reine Systemintegration ausrichten und mit Review #1 abgleichen
+
+### Problem
+
+- In der ersten Fassung kamen Inhalte der Anwendungsentwicklung vor (Aufgaben, Tests, Schema). Meine Präsentation muss klar nur meinen FiSi-Teil zeigen.
+- Unklar war, ob die neue Präsentation das Feedback aus Review #1 aufgreift und was sich wiederholen würde.
+
+### Lösung
+
+- Alle AE-Inhalte von den Folien entfernt; die Anwendung kommt nur als Black Box vor, die ich betreibe.
+- Abgleich mit meinen Notizen zu Review #1: Neue Folie „Feedback aus Review #1 – und was daraus wurde“ und eigene Folie „Zusammenarbeit mit KI: Kontrolle in Schichten“, weil die Prüfer Deploy-Pipeline und KI-Zusammenarbeit als Schwerpunkt empfohlen hatten.
+- Server-Grundschutz nur noch als „bereits gezeigt“ erwähnt; Probefragen von damals im Spickzettel beantwortet.
+- Eine Aussage zur KI-Kontrolle war zu stark („jede Änderung gekennzeichnet“) und wurde korrigiert.
+
+### Lessons Learned
+
+- Feedback ausdrücklich aufgreifen: Prüfer sollen sehen, dass ihre Hinweise umgesetzt wurden.
+- Bei Teamarbeit klar trennen, was mein Teil ist – sonst wirkt es, als würde ich fremde Arbeit vorstellen.
+- Auch auf Folien gilt: nichts behaupten, was ich nicht belegen kann.
+
+---

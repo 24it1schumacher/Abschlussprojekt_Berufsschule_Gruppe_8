@@ -137,7 +137,7 @@ HINTERGRUND:
 {
   const s = content("Mein Auftrag: die Anwendung sicher und automatisch betreiben", "Vortrag");
   const tiles = [
-    ["Server-Grundschutz", "Persönliche SSH-Konten, Firewall, fail2ban, automatische Updates", "#2 · #3"],
+    ["Server-Grundschutz", "Persönliche SSH-Konten, Firewall, fail2ban, automatische Updates", "#2 · #3 · Thema in Review #1"],
     ["Container-Laufzeit", "Docker aus offizieller Paketquelle, mehrere Dienste per Compose", "#34"],
     ["Datenbank bereitstellen", "PostgreSQL im Container: versioniert, persistent, nicht öffentlich", "#14"],
     ["Reverse Proxy und TLS", "Ein Eingang, getrennte Netze, HTTPS mit Let's Encrypt", "#8 · #18"],
@@ -157,45 +157,54 @@ HINTERGRUND:
 `ZEIT: ca. 25 Sekunden.
 
 SAGEN:
-"Meine Aufgabe als Fachinformatiker für Systemintegration ist der Betrieb: den Server absichern, die Container-Umgebung bereitstellen, die Datenbank betreiben, die Anwendung über einen gesicherten Eingang erreichbar machen und dafür sorgen, dass Änderungen automatisch geprüft und ausgerollt werden. Heute liegt der Schwerpunkt auf den Punkten 3 bis 6."
+"Meine Aufgabe als Fachinformatiker für Systemintegration ist der Betrieb: den Server absichern, die Container-Umgebung bereitstellen, die Datenbank betreiben, die Anwendung über einen gesicherten Eingang erreichbar machen und dafür sorgen, dass Änderungen automatisch geprüft und ausgerollt werden. Punkt 1 habe ich im letzten Review gezeigt, heute liegt der Schwerpunkt auf den Punkten 3 bis 6."
 
 FÜR RÜCKFRAGEN:
 - Server-Grundschutz (#2, #3) war Thema im Review #1 (ufw, fail2ban, unattended-upgrades, SSH nur mit Schlüssel).
 - Fragen zum Anwendungscode selbst gehören zur Anwendungsentwicklung. Antwort: "Das ist nicht mein Teil – ich betreibe die Anwendung als Black Box und kann erklären, wie sie gebaut, geprüft, ausgerollt und abgesichert wird."`);
 }
 
-// 2 Ausgangslage -> Ziel -----------------------------------------------
+// 2 Review #1 -> umgesetzt ---------------------------------------------
 {
-  const s = content("Ausgangslage und Ziel", "Vortrag");
-  card(s, 0.5, 1.5, 5.95, 3.7, "Karte Vorher");
-  card(s, 6.88, 1.5, 5.95, 3.7, "Karte Jetzt");
-  s.addText("VORHER", { x: 0.85, y: 1.85, w: 5, h: 0.4, fontSize: 14, bold: true, color: C.accent3, charSpacing: 2, margin: 0, isTextBox: true });
-  s.addText("JETZT", { x: 7.23, y: 1.85, w: 5, h: 0.4, fontSize: 14, bold: true, color: C.accent1, charSpacing: 2, margin: 0, isTextBox: true });
-  const before = [
-    "Anwendung lief nicht auf dem Server",
-    "Keine Datenbank auf dem Server",
-    "Jedes Update: einloggen, pullen, neu starten",
-    "Kein HTTPS, keine automatischen Tests",
+  const s = content("Feedback aus Review #1 – und was daraus wurde", "Vortrag");
+  const rows = [
+    ["Folien zu dünn: Konfigurationen und Logs zeigen", "Jede Folie mit echter Konfiguration oder echtem Server-Protokoll", "Folien 5–9"],
+    ["Empfehlung: vollautomatische Deploy-Pipeline", "CI und automatisches Deployment laufen seit 25.11. auf dem VPS", "Folien 7–8"],
+    ["Empfehlung: Zusammenarbeit mit KI zeigen", "Kontrolle in Schichten: was die KI darf und was nicht", "Folie 10"],
   ];
-  const after = [
-    "Ein Befehl startet Datenbank, Backend und Webserver",
-    "Jeder Push wird automatisch geprüft (CI)",
-    "Der Server rollt geprüfte Stände selbst aus",
-    "Erreichbar nur verschlüsselt: bbk-it-08.de",
-  ];
-  const list = (arr) => arr.map((t, i) => ({ text: t, options: { bullet: { indent: 18 }, breakLine: i < arr.length - 1 } }));
-  s.addText(list(before), { x: 0.85, y: 2.5, w: 5.3, h: 2.5, fontSize: 20, color: C.background2, paraSpaceAfter: 14, valign: "top", margin: 0, isTextBox: true });
-  s.addText(list(after), { x: 7.23, y: 2.5, w: 5.3, h: 2.5, fontSize: 20, color: C.background1, paraSpaceAfter: 14, valign: "top", margin: 0, isTextBox: true });
-  s.addText("→", { x: 6.4, y: 3.05, w: 0.5, h: 0.6, fontSize: 30, bold: true, color: C.accent1, align: "center", valign: "middle", margin: 0, isTextBox: true });
+  s.addText("REVIEW #1", { x: 0.5, y: 1.45, w: 5.2, h: 0.35, fontSize: 13, bold: true, color: C.accent3, charSpacing: 2, margin: 0, isTextBox: true });
+  s.addText("HEUTE", { x: 6.55, y: 1.45, w: 5.0, h: 0.35, fontSize: 13, bold: true, color: C.accent1, charSpacing: 2, margin: 0, isTextBox: true });
+  rows.forEach(([fb, done, ref], i) => {
+    const y = 1.95 + i * 1.32;
+    card(s, 0.5, y, 5.45, 1.12, "Feedback " + (i + 1));
+    card(s, 6.55, y, 6.28, 1.12, "Umsetzung " + (i + 1));
+    s.addText(fb, { x: 0.8, y, w: 4.9, h: 1.12, fontSize: 16, color: C.background2, valign: "middle", margin: 0, isTextBox: true });
+    s.addText("→", { x: 5.95, y, w: 0.6, h: 1.12, fontSize: 26, bold: true, color: C.accent1, align: "center", valign: "middle", margin: 0, isTextBox: true });
+    s.addText([
+      { text: done, options: { color: C.background1, fontSize: 16, breakLine: true } },
+      { text: ref, options: { color: C.accent2, fontSize: 12 } },
+    ], { x: 6.85, y, w: 5.8, h: 1.12, valign: "middle", margin: 0, isTextBox: true });
+  });
+  s.addText([
+    { text: "Bereits in Review #1 gezeigt: ", options: { bold: true, color: C.accent5 } },
+    { text: "Server-Grundschutz (SSH-Schlüssel, ufw, fail2ban, automatische Updates). Heute baut alles darauf auf.", options: { color: C.background2 } },
+  ], { x: 0.5, y: 6.0, w: 12.3, h: 0.6, fontSize: 14, valign: "middle", margin: 0, isTextBox: true });
   s.addNotes(
 `ZEIT: ca. 30 Sekunden.
 
 SAGEN:
-"Vorher lief die Anwendung nur auf den Rechnern der Entwickler. Auf dem Server gab es keine Datenbank, und jedes Update hätte bedeutet: einloggen, Code holen, neu starten. Mein Ziel war ein System, das ohne Handarbeit funktioniert – aber nur geprüften Code ausrollt und nur verschlüsselt erreichbar ist."
+"Im letzten Review war der Inhalt gut, die Präsentation aber zu dünn – Sie wollten Konfigurationen und Logs sehen. Außerdem haben Sie zwei Schwerpunkte empfohlen: eine vollautomatische Deploy-Pipeline und die Zusammenarbeit mit KI. Genau das habe ich umgesetzt. Den Server-Grundschutz habe ich letztes Mal gezeigt – heute baut alles darauf auf."
 
-WENN GEFRAGT "Warum automatisieren?":
-- Manuelle Schritte vergisst man oder macht sie unterschiedlich. Automatisierung ist reproduzierbar und dokumentiert sich selbst (Protokoll).
-- Wer Änderungen liefert, braucht keinen Zugang zum Server (Least Privilege).`);
+HINTERGRUND REVIEW #1:
+- Bewertung: Inhalt Note 1 (Fragen gut beantwortet), Präsentation Note 5 (zu wenig Einblick, 3–5 Stichpunkte je Folie).
+- Gewünscht: Konfigurationen und Logs an Beispielen erklären, mehr Fachinhalt, auf den Folien präsentieren statt daneben reden.
+- Deshalb heute: auf jeder Inhaltsfolie echtes Material – darauf zeigen und es erklären.
+
+PROBEFRAGEN AUS DER VORBEREITUNG ZU REVIEW #1 (können wieder kommen):
+- Warum umgeht Docker die ufw-Regeln? → Backup-Folie "Warum Docker die ufw-Regeln umgeht".
+- Warum ein Volume? → Folie Datenbank.
+- Warum fail2ban UND ufw? → ufw begrenzt, welche Ports überhaupt erreichbar sind; fail2ban sperrt IPs, die an einem offenen Port (SSH) wiederholt falsche Anmeldungen versuchen. Zwei Schichten, unterschiedliche Aufgaben.
+- Warum war der Neustart nach dem Kernel-Update nötig? → unattended-upgrades installiert den neuen Kernel, aktiv wird er erst nach einem Neustart (laufender Kernel ≠ installierter Kernel; /var/run/reboot-required).`);
 }
 
 // 3 Architektur -------------------------------------------------------
@@ -396,6 +405,44 @@ WENN GEFRAGT "Warum ist trotzdem eine ufw-Regel für 80/443 drin?":
 - Dokumentation der gewollten Freigabe. Die tatsächliche Freigabe steuert bei Docker die Zeile ports: in der Compose-Datei.`);
 }
 
+// 8b Zusammenarbeit mit KI ------------------------------------------------
+{
+  const s = content("Zusammenarbeit mit KI: Kontrolle in Schichten", "Vortrag");
+  const head = (t) => ({ text: t, options: { bold: true, color: C.background1, fill: { color: C.accent6 } } });
+  const cell = (t, color) => ({ text: t, options: { color: color || C.background2 } });
+  const ok = (t) => cell(t, C.accent1), open = (t) => cell(t, C.accent4);
+  const rows = [
+    [head("Schicht"), head("Umsetzung im Projekt"), head("Kann die KI das umgehen?"), head("Status")],
+    [cell("Berechtigungen"), cell("KI arbeitet ohne sudo-Passwort; Root-Schritte führe ich selbst aus"), cell("nein"), ok("umgesetzt")],
+    [cell("Automatische Prüfung"), cell("Server rollt nur Commits mit grüner CI aus"), cell("nein"), ok("umgesetzt")],
+    [cell("Nachvollziehbarkeit"), cell("KI-Commits mit „Co-Authored-By“ gekennzeichnet"), cell("ja – Regel, keine Sperre"), ok("umgesetzt")],
+    [cell("Mensch prüft"), cell("Test auf dem echten Server, Sicherheitsfragen stellen"), cell("–"), ok("umgesetzt")],
+    [cell("Repository-Regeln"), cell("Branch Protection: Merge nur mit Review und grüner CI"), cell("nein"), open("offen")],
+  ];
+  s.addTable(rows, { x: 0.5, y: 1.45, w: 12.3, colW: [2.4, 5.3, 2.8, 1.8], fontSize: 15, fontFace: THEME.bodyFontFace,
+    border: { type: "solid", pt: 0.75, color: "3A404C" }, fill: { color: BG }, rowH: 0.6, valign: "middle", margin: [0.06, 0.12, 0.06, 0.12] });
+  card(s, 0.5, 5.35, 12.3, 1.25, "Karte Beleg");
+  s.addText([
+    { text: "Beleg: ", options: { bold: true, color: C.accent1 } },
+    { text: "Zwei Fehler der KI-Skripte habe ich auf dem Server entdeckt (404, Permission denied). Meine Frage „Ist die Portfreigabe sicher?“ führte zu HTTPS. Die CI hat einen weiteren Fehler automatisch gefunden.", options: { color: C.background1 } },
+  ], { x: 0.8, y: 5.35, w: 11.8, h: 1.25, fontSize: 15, valign: "middle", margin: 0, isTextBox: true });
+  s.addNotes(
+`ZEIT: ca. 40 Sekunden. (Empfehlung aus Review #1)
+
+SAGEN:
+"Skripte und Konfigurationen habe ich mit KI erstellt. Entscheidend ist, wie das kontrolliert wird: Die KI hat keine Root-Rechte auf dem Server – alles mit sudo mache ich selbst. Auf den Server kommt nur, was die CI geprüft hat. Jede KI-Änderung ist im Git-Verlauf gekennzeichnet. Und ich teste auf dem echten System: Zwei Fehler habe ich dort selbst gefunden, und meine Sicherheitsfrage hat die unverschlüsselte Variante verhindert. Offen ist noch Branch Protection – die kann nur der Repository-Besitzer aktivieren."
+
+KERNGEDANKE:
+- Regeln in einer Anweisung an die KI sind nur Bitten. Durchgesetzt wird es durch technische Schichten (Rechte, CI, Repository-Regeln) und durch den Menschen (Defense in Depth).
+- Leitsatz: "Die KI hat keinen Schlüssel zum Server. Ausgerollt wird nur, was die Pipeline geprüft hat."
+
+WENN GEFRAGT "Prompt Injection?":
+- Anweisungen in Logs, Webseiten oder Issues sind für die KI nur Daten. Schutz: Die KI hat keine Produktionsrechte, und alles läuft über CI und Review.
+
+WENN GEFRAGT "Woher weißt du, dass der Code sicher ist?":
+- CI-Prüfungen, Tests von außen (Ports, TLS, Header), eigene Prüfung auf dem Server, Sicherheitsfragen gestellt; Grenzen offen benannt (Branch Protection, Rootless Docker).`);
+}
+
 // 9 Probleme & Lessons Learned -----------------------------------------
 {
   const s = content("Probleme und Lessons Learned", "Vortrag");
@@ -419,8 +466,8 @@ WENN GEFRAGT "Warum ist trotzdem eine ufw-Regel für 80/443 drin?":
     ], { x: x + 0.3, y: 3.75, w: w - 0.6, h: 1.25, valign: "top", margin: 0, isTextBox: true });
   });
   s.addText([
-    { text: "KI-Einsatz: ", options: { bold: true, color: C.accent2 } },
-    { text: "Skripte und Konfiguration mit Claude erstellt. Die zwei Fehler habe ich auf dem Server gefunden, die Sicherheitsfrage habe ich gestellt – geprüft wird von mir, nicht von der KI.", options: { color: C.background2 } },
+    { text: "Fazit: ", options: { bold: true, color: C.accent2 } },
+    { text: "So testen, wie es auf dem Server läuft, und Sicherheit aktiv hinterfragen – das gilt für eigenen und KI-erzeugten Code.", options: { color: C.background2 } },
   ], { x: 0.5, y: 5.45, w: 12.3, h: 0.8, fontSize: 15, valign: "middle", margin: 0, isTextBox: true });
   s.addNotes(
 `ZEIT: ca. 40 Sekunden.

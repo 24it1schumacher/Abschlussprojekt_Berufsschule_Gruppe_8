@@ -1,7 +1,7 @@
 # Spickzettel Fachgespräch 26.11.2026 – Lasse Fischer (FiSi)
 
 Präsentation: [`Fachgespraech_Lasse_Fischer_2026-11-26.pptx`](Fachgespraech_Lasse_Fischer_2026-11-26.pptx)
-(Folien 1–11 Vortrag, ab Folie 12 Backup; ausführliche Sprechertexte stehen in den Notizen jeder Folie)
+(Folien 1–12 Vortrag, ab Folie 13 Backup; ausführliche Sprechertexte stehen in den Notizen jeder Folie)
 
 **Inhalt ausschließlich Systemintegration.** Die Anwendung wird nur als Black Box betrieben; Fragen zum Anwendungscode gehören nicht zu meinem Teil.
 
@@ -9,19 +9,33 @@ Präsentation: [`Fachgespraech_Lasse_Fischer_2026-11-26.pptx`](Fachgespraech_Las
 
 | Folie | Inhalt | Zeit |
 |---|---|---|
-| 1 | Titel und Kennzahlen | 0:15 |
-| 2 | Mein Auftrag als FiSi (6 Aufgaben) | 0:25 |
-| 3 | Vorher → Jetzt | 0:20 |
-| 4 | Architektur: ein Eingang, zwei Netze | 0:35 |
-| 5 | Datenbank: Version, Volume, 127.0.0.1 | 0:35 |
-| 6 | Nachweis Netztrennung und Härtung | 0:25 |
-| 7 | CI mit GitHub Actions | 0:25 |
-| 8 | Automatisches Deployment (Kern!) | 0:50 |
-| 9 | Live und verschlüsselt | 0:25 |
-| 10 | Probleme und Lessons Learned | 0:35 |
-| 11 | Ergebnis und nächste Schritte | 0:15 |
+| 1 | Titel und Kennzahlen | 0:10 |
+| 2 | Mein Auftrag als FiSi (6 Aufgaben) | 0:20 |
+| 3 | Feedback aus Review #1 → umgesetzt | 0:25 |
+| 4 | Architektur: ein Eingang, zwei Netze | 0:30 |
+| 5 | Datenbank: Version, Volume, 127.0.0.1 | 0:30 |
+| 6 | Nachweis Netztrennung und Härtung | 0:20 |
+| 7 | CI mit GitHub Actions | 0:20 |
+| 8 | Automatisches Deployment (Kern!) | 0:45 |
+| 9 | Live und verschlüsselt | 0:20 |
+| 10 | Zusammenarbeit mit KI: Kontrolle in Schichten | 0:35 |
+| 11 | Probleme und Lessons Learned | 0:25 |
+| 12 | Ergebnis und nächste Schritte | 0:10 |
 
-Zu knapp? Folie 6 und 9 nur kurz zeigen („Nachweis siehe Bild“).
+Zu knapp? Folie 6 und 9 nur kurz zeigen („Nachweis siehe Bild“), Folie 11 auf einen Satz kürzen.
+
+## Was in Review #1 war (nicht wiederholen, aber darauf aufbauen)
+
+- **Bewertung:** Inhalt Note 1, Präsentation Note 5 – zu wenig Einblick, nur 3–5 Stichpunkte je Folie.
+- **Gewünscht:** Konfigurationen und Logs an Beispielen erklären, mehr Fachinhalt, **auf den Folien** präsentieren statt daneben reden → heute auf das Bild zeigen und Zeile für Zeile erklären.
+- **Empfehlung der Prüfer:** vollautomatische Deploy-Pipeline und Zusammenarbeit mit KI → Folien 7–8 und 10.
+- **Bereits gezeigt:** Server-Grundschutz (SSH-Schlüssel, ufw, fail2ban, unattended-upgrades) → heute nur als Grundlage erwähnen.
+
+Probefragen aus der Vorbereitung zu Review #1 (können wieder kommen):
+- **Warum fail2ban UND ufw?** ufw legt fest, welche Ports überhaupt erreichbar sind. fail2ban sperrt IP-Adressen, die an einem offenen Port (SSH) wiederholt falsche Anmeldungen versuchen. Zwei Schichten mit unterschiedlicher Aufgabe.
+- **Warum war der Neustart nach dem Kernel-Update nötig?** unattended-upgrades installiert den neuen Kernel, aktiv wird er erst nach einem Neustart (laufender ≠ installierter Kernel; Hinweis in `/var/run/reboot-required`).
+- **Warum umgeht Docker ufw?** Siehe unten und Backup-Folie 14.
+- **Warum ein Volume?** Siehe Folie 5.
 
 ## Die Kernaussage in einem Satz
 

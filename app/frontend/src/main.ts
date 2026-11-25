@@ -2,17 +2,22 @@ import {
   changePassword,
   checkDatabase,
   checkHealth,
-  createMessage,
   getCurrentUser,
-  getMessages,
+  getRentals,
+  getReservations,
   login,
   logout,
-  type Message,
+  searchMachines,
+  type Machine,
+  type Rental,
+  type Reservation,
   type UserSession,
 } from "./api";
 import "./style.css";
 
 const apiStatus = document.querySelector<HTMLParagraphElement>("#api-status");
+const catalogStatus = document.querySelector<HTMLParagraphElement>("#catalog-status");
+const machineList = document.querySelector<HTMLUListElement>("#machine-list");
 const loginSection = document.querySelector<HTMLElement>("#login-section");
 const loginForm = document.querySelector<HTMLFormElement>("#login-form");
 const loginEmail = document.querySelector<HTMLInputElement>("#login-email");
@@ -24,22 +29,23 @@ const currentPassword = document.querySelector<HTMLInputElement>("#current-passw
 const newPassword = document.querySelector<HTMLInputElement>("#new-password");
 const passwordStatus = document.querySelector<HTMLParagraphElement>("#password-status");
 const logoutButton = document.querySelector<HTMLButtonElement>("#logout-button");
-const messagesSection = document.querySelector<HTMLElement>("#messages-section");
-const messageForm = document.querySelector<HTMLFormElement>("#message-form");
-const messageInput = document.querySelector<HTMLInputElement>("#message-text");
-const formStatus = document.querySelector<HTMLParagraphElement>("#form-status");
-const messageList = document.querySelector<HTMLUListElement>("#message-list");
+const accountSection = document.querySelector<HTMLElement>("#account-section");
+const reservationList = document.querySelector<HTMLUListElement>("#reservation-list");
+const rentalList = document.querySelector<HTMLUListElement>("#rental-list");
+const accountStatus = document.querySelector<HTMLParagraphElement>("#account-status");
 
 if (
-  !apiStatus || !loginSection || !loginForm || !loginEmail || !loginPassword || !loginStatus
-  || !passwordSection || !passwordForm || !currentPassword || !newPassword || !passwordStatus
-  || !logoutButton || !messagesSection || !messageForm || !messageInput || !formStatus || !messageList
+  !apiStatus || !catalogStatus || !machineList || !loginSection || !loginForm || !loginEmail || !loginPassword
+  || !loginStatus || !passwordSection || !passwordForm || !currentPassword || !newPassword || !passwordStatus
+  || !logoutButton || !accountSection || !reservationList || !rentalList || !accountStatus
 ) {
   throw new Error("Die benötigten Elemente der Seite wurden nicht gefunden.");
 }
 
 const elements = {
   apiStatus,
+  catalogStatus,
+  machineList,
   loginSection,
   loginForm,
   loginEmail,
@@ -51,25 +57,110 @@ const elements = {
   newPassword,
   passwordStatus,
   logoutButton,
-  messagesSection,
-  messageForm,
-  messageInput,
-  formStatus,
-  messageList,
+  accountSection,
+  reservationList,
+  rentalList,
+  accountStatus,
 };
 
-function renderMessages(messages: Message[]): void {
-  const items = messages.map((message) => {
-    const item = document.createElement("li");
-    const timestamp = new Date(message.createdAt).toLocaleString("de-DE");
-    item.textContent = `${message.text} (${timestamp})`;
-    return item;
-  });
-  elements.messageList.replaceChildren(...items);
+const reservationLabels: Record<Reservation["status"], string> = {
+  REQUESTED: "Angefragt",
+  CONFIRMED: "Bestätigt",
+  CANCELLED: "Storniert",
+  REJECTED: "Abgelehnt",
+  CLOSED: "Abgeschlossen",
+};
+
+const rentalLabels: Record<Rental["status"], string> = {
+  OPEN: "Offen",
+  ACTIVE: "Aktiv",
+  COMPLETED: "Abgeschlossen",
+  CANCELLED: "Storniert",
+};
+
+function formatDate(value: string): string {
+  return new Date(value).toLocaleString("de-DE");
 }
 
-async function refreshMessages(): Promise<void> {
-  renderMessages(await getMessages());
+function replaceWithEmptyMessage(list: HTMLUListElement, message: string): void {
+  const item = document.createElement("li");
+  item.textContent = message;
+  list.replaceChildren(item);
+}
+
+function renderMachines(machines: Machine[]): void {
+  if (machines.length === 0) {
+    replaceWithEmptyMessage(elements.machineList, "Zurzeit sind keine mietbaren Maschinen eingetragen.");
+    return;
+  }
+
+  const items = machines.map((machine) => {
+    const item = document.createElement("li");
+    const price = new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: machine.currencyCode,
+    }).format(machine.dailyRentalRate);
+    item.textContent =
+      `${machine.machineTypeName} (${machine.serialNumber}) – ${machine.locationCity}, ${price} pro Tag`;
+    return item;
+  });
+  elements.machineList.replaceChildren(...items);
+}
+
+function renderReservations(reservations: Reservation[]): void {
+  if (reservations.length === 0) {
+    replaceWithEmptyMessage(elements.reservationList, "Du hast noch keine Reservierungen.");
+    return;
+  }
+
+  const items = reservations.map((reservation) => {
+    const item = document.createElement("li");
+    item.textContent =
+      `${reservation.machineTypeName} (${reservation.serialNumber}) – `
+      + `${formatDate(reservation.startAt)} bis ${formatDate(reservation.endAt)} – `
+      + reservationLabels[reservation.status];
+    return item;
+  });
+  elements.reservationList.replaceChildren(...items);
+}
+
+function renderRentals(rentals: Rental[]): void {
+  if (rentals.length === 0) {
+    replaceWithEmptyMessage(elements.rentalList, "Es gibt noch keine Aufträge zu deinem Konto.");
+    return;
+  }
+
+  const items = rentals.map((rental) => {
+    const item = document.createElement("li");
+    item.textContent =
+      `${rental.orderNumber}: ${rental.machineTypeName} (${rental.serialNumber}) – `
+      + rentalLabels[rental.status];
+    return item;
+  });
+  elements.rentalList.replaceChildren(...items);
+}
+
+async function refreshCatalog(): Promise<void> {
+  try {
+    const machines = await searchMachines();
+    renderMachines(machines);
+    elements.catalogStatus.textContent = `${machines.length} mietbare Maschinen gefunden.`;
+  } catch {
+    elements.catalogStatus.textContent =
+      "Der Maschinenkatalog konnte nicht geladen werden. Prüfe, ob die Datenbank-Schritte 003 bis 010 ausgeführt wurden.";
+  }
+}
+
+async function refreshAccount(): Promise<void> {
+  try {
+    const [reservations, rentals] = await Promise.all([getReservations(), getRentals()]);
+    renderReservations(reservations);
+    renderRentals(rentals);
+    elements.accountStatus.textContent = "";
+  } catch (error) {
+    elements.accountStatus.textContent =
+      error instanceof Error ? error.message : "Kontodaten konnten nicht geladen werden.";
+  }
 }
 
 async function showSession(session: UserSession): Promise<void> {
@@ -79,26 +170,21 @@ async function showSession(session: UserSession): Promise<void> {
 
   if (session.passwordChangeRequired) {
     elements.passwordSection.hidden = false;
-    elements.messagesSection.hidden = true;
+    elements.accountSection.hidden = true;
     return;
   }
 
   elements.passwordSection.hidden = true;
-  elements.messagesSection.hidden = false;
-  try {
-    await refreshMessages();
-  } catch {
-    elements.formStatus.textContent =
-      "Nachrichten konnten nicht geladen werden. Für den Beispielbereich muss SQL-Schritt 001 ausgeführt sein.";
-  }
+  elements.accountSection.hidden = false;
+  await refreshAccount();
 }
 
 function showLoggedOut(message = ""): void {
   elements.loginSection.hidden = false;
   elements.passwordSection.hidden = true;
-  elements.messagesSection.hidden = true;
+  elements.accountSection.hidden = true;
   elements.logoutButton.hidden = true;
-  elements.apiStatus.textContent = message || "Bitte melde dich an.";
+  elements.apiStatus.textContent = message || "Melde dich an, um deine Reservierungen und Aufträge zu sehen.";
 }
 
 async function initialize(): Promise<void> {
@@ -108,13 +194,17 @@ async function initialize(): Promise<void> {
   } catch {
     elements.apiStatus.textContent =
       "Backend oder PostgreSQL ist nicht erreichbar. Prüfe Verbindung und Startanleitung.";
+    elements.catalogStatus.textContent = "Der Maschinenkatalog ist derzeit nicht verfügbar.";
     return;
   }
+
+  elements.apiStatus.textContent = "Backend und PostgreSQL sind erreichbar.";
+  await refreshCatalog();
 
   try {
     await showSession(await getCurrentUser());
   } catch {
-    showLoggedOut("Backend und PostgreSQL sind erreichbar. Bitte melde dich an.");
+    showLoggedOut();
   }
 }
 
@@ -149,21 +239,6 @@ elements.logoutButton.addEventListener("click", async () => {
     showLoggedOut("Du wurdest abgemeldet.");
   } catch (error) {
     elements.apiStatus.textContent = error instanceof Error ? error.message : "Abmelden fehlgeschlagen.";
-  }
-});
-
-elements.messageForm.addEventListener("submit", async (event: SubmitEvent) => {
-  event.preventDefault();
-  elements.formStatus.textContent = "";
-
-  try {
-    await createMessage(elements.messageInput.value.trim());
-    elements.messageInput.value = "";
-    elements.formStatus.textContent = "Nachricht wurde gespeichert.";
-    await refreshMessages();
-  } catch (error) {
-    elements.formStatus.textContent =
-      error instanceof Error ? error.message : "Nachricht konnte nicht gespeichert werden.";
   }
 });
 

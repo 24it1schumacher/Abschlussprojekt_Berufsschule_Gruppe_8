@@ -78,13 +78,13 @@ CREATE DATABASE maschinenverleih OWNER maschinenverleih_app;
 
 `CREATE DATABASE` darf nicht innerhalb eines SQL-`BEGIN`/`COMMIT` ausgeführt werden. Wenn Rolle oder Datenbank schon existieren, lege sie nicht ein zweites Mal an; prüfe mit `\du` bzw. `\l` und verwende die vorhandenen Daten. `\password maschinenverleih_app` kann auch zum Ändern des Passworts einer vorhandenen Rolle verwendet werden. Setze den Rolle-Passwortwert in IntelliJ als `DB_PASSWORD`.
 
-Der Datenbank-Verbindungstest des Backends ist `GET http://localhost:8080/api/health/database`; er führt `SELECT 1` aus und braucht noch keine Anwendungstabelle. Für das erste gespeicherte Beispiel muss `app_message` einmalig manuell erstellt werden. Unter PowerShell führst du den SQL-Schritt aus dem Repository-Hauptordner so aus:
+Der Datenbank-Verbindungstest des Backends ist `GET http://localhost:8080/api/health/database`; er führt `SELECT 1` aus und braucht noch keine Anwendungstabelle. Die Beispieltabelle `app_message` ist nur für einen optionalen technischen API-Test nötig; das Frontend verwendet sie nicht. Falls du diesen API-Test durchführen möchtest, erstelle die Tabelle einmalig. Unter PowerShell führst du den SQL-Schritt aus dem Repository-Hauptordner so aus:
 
 ```powershell
 Get-Content -Raw app/backend/src/main/resources/db/001_create_app_message.sql | docker exec -i testdocker-postgres-1 psql -U postgres -d maschinenverleih
 ```
 
-Ersetze `postgres` ggf. durch den Administratorbenutzer deines Containers. Wenn das Frontend läuft, zeigt es nach erfolgreicher Verbindungsprüfung „Backend und PostgreSQL sind erreichbar“ an; über das Formular kannst du dann eine Testnachricht anlegen und anschließend wieder aus der Datenbank lesen. Fehlt nur die Beispieltabelle, weist die Oberfläche gesondert auf SQL-Schritt 001 hin.
+Ersetze `postgres` ggf. durch den Administratorbenutzer deines Containers. Die Tabelle ist nicht Teil des fachlichen Maschinenverleih-Schemas.
 
 ## PostgreSQL lokal mit Docker starten
 
@@ -157,9 +157,10 @@ Die REST-Schnittstelle ist in [`openapi.yaml`](openapi.yaml) beschrieben. Die Ty
 
 - `GET http://localhost:8080/api/health` prüft, ob das Backend antwortet.
 - `GET http://localhost:8080/api/health/database` führt `SELECT 1` gegen PostgreSQL aus.
-- Nach der Anmeldung listet `GET http://localhost:8080/api/messages` gespeicherte Testnachrichten.
-- `POST http://localhost:8080/api/messages` legt eine Testnachricht an. Der Request enthält JSON wie `{"text":"Erste Testnachricht"}`.
-- Die Beispieloberfläche bietet Anmeldung, Passwortwechsel und Abmeldung. Die übrigen Fach-API-Funktionen werden über den TypeScript-API-Client aufgerufen; vollständige Verwaltungsformulare sind noch nicht umgesetzt.
+- Die Oberfläche zeigt den öffentlichen Maschinenkatalog. Nach der Anmeldung kann ein Benutzer seine Reservierungen und Aufträge sehen.
+- Der Login ist nötig, um persönliche Kontodaten zu schützen. Das erste Administratorkonto stammt aus den Umgebungsvariablen `BOOTSTRAP_ADMIN_EMAIL` und `BOOTSTRAP_ADMIN_PASSWORD`.
+- `app_message` und `/api/messages` sind nur ein optionales technisches Beispiel für direkte API-Tests; sie werden in der Benutzeroberfläche nicht verwendet.
+- Vollständige Formulare für Reservierungen und Mitarbeiterverwaltung sind noch nicht umgesetzt.
 - Die vollständigen Schnittstellen sind in [`openapi.yaml`](openapi.yaml) dokumentiert.
 
 Der Browser spricht ausschließlich mit dem Java-Backend. Nur das Backend erhält PostgreSQL-Zugangsdaten und greift mit JDBC auf die Datenbank zu.

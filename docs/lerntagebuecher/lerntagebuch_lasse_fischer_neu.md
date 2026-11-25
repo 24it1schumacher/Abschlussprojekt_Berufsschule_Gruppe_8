@@ -150,13 +150,13 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 
 - Die lokale Compose-Datei war für die Entwicklung gedacht; für den Server fehlten feste Version, Netzwerkabgrenzung und ein klarer Fehler bei fehlendem Passwort.
 - Unklar, wie man „Port nicht öffentlich“, „Daten bleiben erhalten“ und „Schema wird nicht automatisch angelegt“ so nachweist, dass es auf einer Folie überzeugt.
-- Jakobs SQL-Dateien 003–010 wechseln nicht selbst die Rolle; als Administrator eingespielt hätten die Tabellen dem falschen Besitzer gehört.
+- Die SQL-Dateien der Anwendung (003–010) wechseln nicht selbst die Rolle; als Administrator eingespielt hätten die Tabellen dem falschen Besitzer gehört.
 
 ### Lösung
 
 - `infra/postgres/compose.yaml`: Image `postgres:17.11-trixie`, benanntes Volume, Port nur `127.0.0.1:5432`, internes Netz, `no-new-privileges`, Log-Rotation, `${POSTGRES_ADMIN_PASSWORD:?…}` für einen sichtbaren Abbruch ohne Passwort.
 - Erst lokal mit Docker Desktop getestet: Container-ID vor/nach `down`/`up` verglichen (Daten noch da), Port über die LAN-IP geprüft (zu), Verbindung aus einem Wegwerf-Container im internen Netz und Gegenprobe ohne Netz.
-- Vor jede SQL-Datei `SET ROLE maschinenverleih_app` gesetzt → 27 Tabellen gehören der Anwendungsrolle.
+- Vor jede SQL-Datei `SET ROLE maschinenverleih_app` gesetzt → alle Tabellen gehören der Anwendungsrolle, nicht dem Datenbank-Administrator.
 - KI-Einsatz: Claude hat Compose-Datei, Anleitung und Nachweis-Skripte entworfen; die Ergebnisse habe ich an den echten Ausgaben geprüft. Screenshots unter `docs/praesentation/story10/`.
 
 ### Lessons Learned
@@ -171,12 +171,12 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 
 ### Problem
 
-- Jakobs Anwendung lief nur im Entwicklungsmodus (IntelliJ und `npm run dev`); es gab keinen Webserver, keine Images und keinen gemeinsamen Start.
+- Die Anwendung lief nicht auf dem Server; es gab keinen Webserver, keine Images und keinen gemeinsamen Start.
 - Frontend und Backend auf getrennten Ports hätten CORS und zwei offene Ports bedeutet.
 
 ### Lösung
 
-- Mehrstufige Dockerfiles: Backend baut mit Maven und führt dabei Jakobs 13 Tests aus, Laufzeit nur mit JRE als UID 1000; Frontend wird mit Node gebaut und von Caddy ausgeliefert.
+- Mehrstufige Dockerfiles: Build-Stufe und schlanke Laufzeit-Stufe; der Anwendungs-Container läuft als UID 1000, die vorhandenen Tests laufen beim Bau mit; Caddy liefert die Oberfläche aus.
 - Caddy als Reverse Proxy: `/api/*` → Backend, alles andere → Frontend. Damit ein einziger Eingang und kein CORS.
 - Zwei Netze: `web-intern` (Webserver ↔ Backend) und `db-intern` (Backend ↔ Datenbank). Nachweis: Der Webserver-Container kennt `postgres` nicht (`bad address`).
 - Login im Browser über den Proxy getestet (Cookie und CSRF funktionieren). Screenshots unter `docs/praesentation/app_stack/`.
@@ -211,7 +211,7 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 
 ### Problem
 
-- Ziel: Jakobs Änderungen sollen ohne manuelles Eingreifen auf dem Server landen, aber nur geprüfte Stände.
+- Ziel: Änderungen im Repository sollen ohne manuelles Eingreifen auf dem Server landen, aber nur geprüfte Stände.
 - Erster Versuch auf dem Server: `404` beim Download von `install.sh` – die Datei lag noch nicht auf `main`, sondern nur auf dem Feature-Branch.
 - Zweiter Versuch: `Permission denied` – Git unter Windows speichert das Ausführungsrecht nicht; der Test in WSL hatte das Skript mit `bash` gestartet und den Fehler deshalb verdeckt.
 - Meine Frage „ist die Portfreigabe sicher?“: Nein – Port 80 mit Login hätte Passwörter und Session-Cookie unverschlüsselt übertragen.

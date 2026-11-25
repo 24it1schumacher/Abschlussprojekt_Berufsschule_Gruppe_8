@@ -1,24 +1,27 @@
 # Spickzettel Fachgespräch 26.11.2026 – Lasse Fischer (FiSi)
 
 Präsentation: [`Fachgespraech_Lasse_Fischer_2026-11-26.pptx`](Fachgespraech_Lasse_Fischer_2026-11-26.pptx)
-(Folien 1–10 Vortrag, ab Folie 11 Backup; ausführliche Sprechertexte stehen in den Notizen jeder Folie)
+(Folien 1–11 Vortrag, ab Folie 12 Backup; ausführliche Sprechertexte stehen in den Notizen jeder Folie)
+
+**Inhalt ausschließlich Systemintegration.** Die Anwendung wird nur als Black Box betrieben; Fragen zum Anwendungscode gehören nicht zu meinem Teil.
 
 ## Ablauf und Zeit (5 Minuten)
 
 | Folie | Inhalt | Zeit |
 |---|---|---|
-| 1 | Titel, App live unter bbk-it-08.de | 0:20 |
-| 2 | Vorher → Jetzt | 0:30 |
-| 3 | Architektur: ein Eingang, zwei Netze | 0:40 |
-| 4 | Datenbank: Version, Volume, 127.0.0.1 | 0:40 |
-| 5 | Nachweis Netztrennung und Härtung | 0:30 |
-| 6 | CI mit GitHub Actions | 0:30 |
-| 7 | Automatisches Deployment (Kern!) | 0:50 |
-| 8 | Live und verschlüsselt | 0:30 |
-| 9 | Probleme und Lessons Learned | 0:40 |
-| 10 | Ergebnis und nächste Schritte | 0:20 |
+| 1 | Titel und Kennzahlen | 0:15 |
+| 2 | Mein Auftrag als FiSi (6 Aufgaben) | 0:25 |
+| 3 | Vorher → Jetzt | 0:20 |
+| 4 | Architektur: ein Eingang, zwei Netze | 0:35 |
+| 5 | Datenbank: Version, Volume, 127.0.0.1 | 0:35 |
+| 6 | Nachweis Netztrennung und Härtung | 0:25 |
+| 7 | CI mit GitHub Actions | 0:25 |
+| 8 | Automatisches Deployment (Kern!) | 0:50 |
+| 9 | Live und verschlüsselt | 0:25 |
+| 10 | Probleme und Lessons Learned | 0:35 |
+| 11 | Ergebnis und nächste Schritte | 0:15 |
 
-Zu knapp? Folie 5 und 8 nur kurz zeigen („Nachweis siehe Bild“).
+Zu knapp? Folie 6 und 9 nur kurz zeigen („Nachweis siehe Bild“).
 
 ## Die Kernaussage in einem Satz
 
@@ -29,7 +32,7 @@ Zu knapp? Folie 5 und 8 nur kurz zeigen („Nachweis siehe Bild“).
 | Baustein | Was macht er? | Datei |
 |---|---|---|
 | PostgreSQL 17.11 | Datenbank im Container, Daten im Volume | `infra/postgres/compose.yaml` |
-| Backend (Spring Boot) | API, läuft als UID 1000, read-only | `app/backend/Dockerfile` |
+| Anwendungs-Container | läuft als UID 1000, read-only, kein Port nach außen | `app/backend/Dockerfile` (Verpackung für den Betrieb) |
 | Caddy | Webserver + Reverse Proxy + automatisches TLS | `app/frontend/Dockerfile`, `infra/proxy/Caddyfile` |
 | Stack | Alle drei zusammen, zwei Netze | `infra/stack/compose.yaml` |
 | CI | Tests und Prüfungen bei jedem Push | `.github/workflows/ci.yml` |
@@ -68,8 +71,8 @@ echo | openssl s_client -connect bbk-it-08.de:443 -servername bbk-it-08.de 2>/de
 
 ## Wahrscheinliche Fragen – Antworten
 
-**Warum PostgreSQL?**
-Nutzwertanalyse (#13). Ausschlaggebend: Die Datenbank kann überlappende Reservierungen derselben Maschine selbst verhindern (Exclusion Constraint mit `btree_gist`, Schema 006). Open Source, offizielles Docker-Image.
+**Wie kommt man an die Datenbank?**
+Nur per SSH-Tunnel (`ssh -N -L 5433:127.0.0.1:5432 <konto>@<server>`): verschlüsselt, mit den vorhandenen SSH-Schlüsseln, ohne zusätzlichen offenen Port.
 
 **Warum Docker?**
 Gleiche Umgebung lokal und auf dem Server, reproduzierbar per Datei, Dienste isoliert, leicht neu aufzubauen.
@@ -103,6 +106,6 @@ Merge nach main + Branch Protection, Backup vor jedem Deployment (#26), Monitori
 
 ## Zahlen, die ich parat haben sollte
 
-- 13 Backend-Tests · 3 CI-Prüfungen · Timer alle 2 Minuten · Rollout ca. 2 Minuten nach grüner CI
-- 27 Tabellen, SQL-Schritte 002–010 · PostgreSQL 17.11 · Caddy 2.11 · Java 21
+- 3 CI-Prüfungen · Timer alle 2 Minuten · Rollout ca. 2 Minuten nach grüner CI
+- 3 Container · 2 Netze · offene Ports 22, 80, 443 · PostgreSQL 17.11 · Caddy 2.11
 - VPS: Ubuntu 24.04, 6 Kerne, 11 GB RAM · Zertifikat 90 Tage, Erneuerung automatisch

@@ -1,0 +1,54 @@
+# PostgreSQL auf dem Projekt-VPS (User Story 10 / Issue #14)
+#
+# Start auf dem Server aus diesem Ordner:  docker compose up -d
+# Anleitung und Nachweise:                 docs/anleitung_postgresql_vps.md
+
+name: maschinenverleih-db
+
+services:
+  postgres:
+    # Feste Version statt "latest": jeder Start nutzt dasselbe Image.
+    # Ein Update ist eine bewusste Änderung an dieser Zeile (per Pull Request).
+    image: postgres:17.11-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      # Ohne Passwort bricht "docker compose" schon vor dem Start mit dieser Meldung ab.
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD:?POSTGRES_ADMIN_PASSWORD fehlt - in infra/postgres/.env setzen (siehe .env.example)}
+      # Kein POSTGRES_DB: Anwendungsdatenbank und Schema werden ausdrücklich
+      # von Hand angelegt, nicht nebenbei durch den Containerstart.
+    ports:
+      # Nur an die Loopback-Adresse des Servers gebunden. Von außen ist 5432
+      # nicht erreichbar, auch wenn Docker die ufw-Regeln umgeht.
+      # Zugriff für Entwickler nur über einen SSH-Tunnel.
+      - "127.0.0.1:5432:5432"
+    networks:
+      - db-intern
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    security_opt:
+      # Prozesse im Container können sich keine zusätzlichen Rechte verschaffen.
+      - no-new-privileges:true
+    logging:
+      # Container-Logs begrenzen, damit sie die Festplatte nicht füllen.
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  # Internes Netz für Datenbank und später das Backend.
+  db-intern:
+    name: maschinenverleih-db-intern
+
+volumes:
+  # Benanntes Volume: Daten überleben "docker compose down" und das Neuerstellen des Containers.
+  # Nur "docker compose down -v" würde es löschen.
+  postgres-data:
+    name: maschinenverleih-postgres-data

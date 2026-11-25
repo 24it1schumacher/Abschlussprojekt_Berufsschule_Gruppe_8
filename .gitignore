@@ -14,3 +14,6 @@ CLAUDE.md
 **/.env
 **/.env.*
 !**/.env.example
+
+# Rohdaten der Nachweis-Skripte (vor dem Schwaerzen pruefen)
+infra/postgres/nachweise_vps/

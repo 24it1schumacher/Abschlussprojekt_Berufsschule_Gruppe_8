@@ -1,0 +1,4 @@
+# Dateien, die auf dem Linux-Server laufen, immer mit LF-Zeilenenden auschecken.
+# Mit Windows-Zeilenenden (CRLF) bricht bash mit "$'\r': command not found" ab.
+*.sh        text eol=lf
+infra/**    text eol=lf

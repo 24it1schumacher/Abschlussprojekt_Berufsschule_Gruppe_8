@@ -45,7 +45,7 @@ Version auf dem Server. Niemand muss sich dafür auf dem Server anmelden.
 |---|---|
 | Ports nach außen | 22 (SSH, nur Schlüssel), 80 und 443. Datenbank und Backend haben keinen öffentlichen Port. |
 | Port 80 | Nur für die Zertifikatsprüfung von Let's Encrypt (ACME HTTP-01) und die automatische Umleitung auf HTTPS. Über Port 80 werden keine Anmeldedaten übertragen. |
-| HTTPS | Caddy holt und erneuert das Zertifikat selbst. Ohne eigene Domain wird `<ip>.sslip.io` verwendet (öffentlicher DNS-Dienst, der den Namen auf die IP abbildet). Mit eigener Domain: 3. Argument von `install.sh`. |
+| HTTPS | Caddy holt und erneuert das Zertifikat selbst. **Im Projekt: `https://bbk-it-08.de` und `www.bbk-it-08.de`** (DNS bei Strato, A-Records auf den VPS). Ohne eigene Domain fällt `install.sh` auf `<ip>.sslip.io` zurück. |
 | Cookies | `COOKIE_SECURE=true`: Das Session-Cookie wird nur über HTTPS gesendet; dazu HSTS-Header. |
 | ufw und Docker | Docker veröffentlicht Ports an ufw vorbei (eigene iptables-Regeln). Die ufw-Regeln für 80/443 dokumentieren die Freigabe; die tatsächliche Freigabe steuert `ports:` in `infra/stack/compose.yaml`. |
 | Deploy-Benutzer | Ohne Login-Shell und ohne sudo, aber in der Gruppe `docker` und damit praktisch root-gleich. |
@@ -60,6 +60,7 @@ Branch Protection könnte ein übernommenes GitHub-Konto Code auf den Server bri
 curl -fsSLO https://raw.githubusercontent.com/24it1schumacher/Abschlussprojekt_Berufsschule_Gruppe_8/main/infra/deploy/install.sh
 less install.sh                                     # vor dem Ausführen lesen
 sudo bash install.sh <admin-email> [branch] [hostname]
+# Projekt:  sudo bash install.sh <admin-email> main bbk-it-08.de,www.bbk-it-08.de
 ```
 
 Das Skript erzeugt alle Passwörter selbst, legt Datenbank und Rolle an, gibt 80/443 frei, rollt
@@ -94,6 +95,8 @@ einem Abbruch erneut gestartet werden, ohne Passwörter zu überschreiben.
 | Erster Server-Lauf | Abbruch mit `Permission denied`: Skripte waren im Repository nicht ausführbar (Git unter Windows speichert das Ausführungsrecht nicht). Der WSL-Test hatte das Skript mit `bash` gestartet und den Fehler deshalb nicht gezeigt. Behoben: Ausführungsrecht in Git gesetzt, systemd ruft über `bash` auf. |
 | `install.sh` komplett als root in WSL (Ubuntu 24.04, systemd) | Benutzer, Klon, Passwörter, Datenbank, SQL 002–010, Bau, Start, Admin-Konto: erfolgreich. Gefunden: Timer startete nicht (`Requires=docker.service` existiert unter Docker Desktop nicht). Behoben. |
 | Automatisches Ausrollen | Commit `1ea6318` gepusht → CI grün um 21:42:14 → Timer hat um 21:42:16 selbst ausgerollt |
+| Erster automatischer Rollout auf dem VPS | Commit `febcaed`: CI zunächst „ausstehend“ → Server wartet → CI grün 20:52:23 UTC → Server rollt 20:54:05 UTC selbst aus |
+| Umstellung auf `bbk-it-08.de` | Zertifikate für `bbk-it-08.de` und `www.bbk-it-08.de` automatisch von Let's Encrypt, HTTP → 308 auf HTTPS, 5432/8080 von außen zu |
 | Rollback | Noch nicht praktisch ausgelöst |
 
 ## 8. Grenzen

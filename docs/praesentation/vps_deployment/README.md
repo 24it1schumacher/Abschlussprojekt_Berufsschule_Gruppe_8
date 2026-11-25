@@ -13,6 +13,7 @@ Grün = erwartetes Ergebnis, Rot = gewollt blockiert, Gelb = zum Vergleichen / W
 | `35_github_actions.png` | CI-Lauf auf GitHub: drei Prüfungen grün |
 | `36_app_https.png` | Die Anwendung im Browser über HTTPS |
 
-Erzeugt mit `bash infra/deploy/nachweise_vps.sh <hostname>`; nach dem Wechsel auf `bbk-it-08.de` neu erzeugen.
+Bilder 33, 34 und 36 zeigen die Projektdomain `bbk-it-08.de`. Bild 30 stammt aus dem ersten echten automatischen Rollout (Commit `febcaed`) und wurde bewusst nicht ersetzt.
+Erzeugt mit `bash infra/deploy/nachweise_vps.sh bbk-it-08.de`.
 
 Vorschlag für die Präsentation: 19 (Architektur, Ordner `app_stack`) → 35 → 30 → 33 → 36.

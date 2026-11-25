@@ -224,6 +224,8 @@ Die Anleitung wurde mit Unterstützung der KI aus meinen Befehlen und Ausgaben d
 - Fehler behoben: Ausführungsrecht in Git gesetzt (`git update-index --chmod=+x`), systemd ruft zusätzlich über `bash` auf. Danach das komplette `install.sh` als root in WSL (Ubuntu 24.04) getestet – dabei noch einen Timer-Fehler gefunden und behoben.
 - HTTPS: Caddy holt das Zertifikat automatisch, Port 80 nur noch für Zertifikatsprüfung und Umleitung, Cookie nur über HTTPS.
 - Domain über die Rückwärtsauflösung der Server-IP gefunden: `mail.bbk-it-08.de` → Domain `bbk-it-08.de`; `bbk-it-08.de` und `www` zeigen auf den Server.
+- Mit `sudo bash install.sh … bbk-it-08.de,www.bbk-it-08.de` umgestellt: Caddy hat für beide Namen automatisch Let's-Encrypt-Zertifikate geholt. Die Anwendung läuft unter https://bbk-it-08.de.
+- Erster echter automatischer Rollout: Commit gepusht, Server hat gewartet, bis die CI grün war, und zwei Minuten später selbst ausgerollt.
 
 ### Lessons Learned
 

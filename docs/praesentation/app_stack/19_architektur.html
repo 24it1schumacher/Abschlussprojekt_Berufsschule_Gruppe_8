@@ -1,0 +1,75 @@
+<!doctype html><meta charset="utf-8">
+<style>
+body{margin:0;background:#0f1115;font-family:'Segoe UI',sans-serif;color:#d7dae0}
+.wrap{padding:40px 48px;width:1300px}
+h1{font-size:30px;margin:0 0 6px;color:#fff}
+.sub{color:#8b93a1;font-size:17px;margin-bottom:30px}
+svg text{font-family:'Segoe UI',sans-serif}
+.mono{font-family:'Cascadia Mono',Consolas,monospace}
+</style>
+<div class="wrap">
+<h1>Maschinenverleih als Container-Stack</h1>
+<div class="sub">Ein Befehl startet alles: <span class="mono" style="color:#7fd1ff">docker compose up -d --build</span> &nbsp;·&nbsp; nur der Webserver hat einen Port nach außen</div>
+<svg width="1300" height="520" viewBox="0 0 1300 520">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0L10,5L0,10z" fill="#9aa4b2"/></marker>
+    <marker id="r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0L10,5L0,10z" fill="#fb7c5a"/></marker>
+  </defs>
+  <!-- Host -->
+  <rect x="245" y="20" width="1035" height="470" rx="16" fill="#151820" stroke="#2c313a" stroke-width="2"/>
+  <text x="252" y="52" fill="#8b93a1" font-size="16" font-weight="600">Server (lokal: Docker Desktop · später: VPS)</text>
+
+  <!-- Netze -->
+  <rect x="300" y="80" width="560" height="200" rx="14" fill="#14261d" stroke="#2f6b46" stroke-dasharray="6 5" stroke-width="2"/>
+  <text x="318" y="108" fill="#7ee2a0" font-size="15" class="mono">Netz web-intern</text>
+  <rect x="660" y="260" width="590" height="200" rx="14" fill="#1b2134" stroke="#3d5a9a" stroke-dasharray="6 5" stroke-width="2"/>
+  <text x="1060" y="448" fill="#8fb0ff" font-size="15" class="mono">Netz db-intern</text>
+
+  <!-- Browser -->
+  <rect x="20" y="140" width="170" height="90" rx="12" fill="#262a31" stroke="#4b5260" stroke-width="2"/>
+  <text x="105" y="180" fill="#fff" font-size="20" font-weight="600" text-anchor="middle">Browser</text>
+  <text x="105" y="206" fill="#8b93a1" font-size="14" text-anchor="middle">Kunde / Mitarbeiter</text>
+
+  <!-- Web -->
+  <rect x="330" y="130" width="240" height="120" rx="12" fill="#1f3b2a" stroke="#4ade80" stroke-width="2"/>
+  <text x="450" y="168" fill="#fff" font-size="20" font-weight="600" text-anchor="middle">web</text>
+  <text x="450" y="194" fill="#b8f5c8" font-size="15" text-anchor="middle">Caddy 2.11 · Reverse Proxy</text>
+  <text x="450" y="218" fill="#b8f5c8" font-size="14" text-anchor="middle">liefert Frontend (Vite-Build)</text>
+  <text x="450" y="238" fill="#b8f5c8" font-size="14" text-anchor="middle">Sicherheits-Header</text>
+
+  <!-- Backend -->
+  <rect x="690" y="180" width="240" height="120" rx="12" fill="#2b2f3a" stroke="#c4cbd6" stroke-width="2"/>
+  <text x="810" y="218" fill="#fff" font-size="20" font-weight="600" text-anchor="middle">backend</text>
+  <text x="810" y="244" fill="#d7dae0" font-size="15" text-anchor="middle">Spring Boot · Java 21</text>
+  <text x="810" y="266" fill="#d7dae0" font-size="14" text-anchor="middle">ohne Root · read-only</text>
+  <text x="810" y="286" fill="#d7dae0" font-size="14" text-anchor="middle">kein Port nach außen</text>
+
+  <!-- DB -->
+  <rect x="1000" y="300" width="230" height="120" rx="12" fill="#1b2a4a" stroke="#6b8fe8" stroke-width="2"/>
+  <text x="1115" y="338" fill="#fff" font-size="20" font-weight="600" text-anchor="middle">postgres</text>
+  <text x="1115" y="364" fill="#c9d6ff" font-size="15" text-anchor="middle">PostgreSQL 17.11</text>
+  <text x="1115" y="386" fill="#c9d6ff" font-size="14" text-anchor="middle">Volume: Daten bleiben</text>
+  <text x="1115" y="406" fill="#c9d6ff" font-size="14" text-anchor="middle">Story 10</text>
+
+  <!-- Pfeile -->
+  <line x1="190" y1="185" x2="326" y2="185" stroke="#9aa4b2" stroke-width="3" marker-end="url(#a)"/>
+  <text x="258" y="172" fill="#fff" font-size="15" text-anchor="middle" class="mono">:8080 / :80</text>
+  <text x="215" y="248" fill="#8b93a1" font-size="13" text-anchor="middle">einziger Eingang</text>
+
+  <path d="M570,205 L686,235" stroke="#9aa4b2" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <text x="625" y="200" fill="#fff" font-size="15" text-anchor="middle" class="mono">/api/*</text>
+
+  <path d="M930,270 L996,330" stroke="#9aa4b2" stroke-width="3" fill="none" marker-end="url(#a)"/>
+  <text x="975" y="285" fill="#fff" font-size="15" class="mono">JDBC</text>
+
+  <!-- blockiert -->
+  <path d="M520,250 C560,400 800,400 996,370" stroke="#fb7c5a" stroke-width="3" stroke-dasharray="8 6" fill="none" marker-end="url(#r)"/>
+  <circle cx="700" cy="378" r="17" fill="#40231f" stroke="#fb7c5a" stroke-width="2"/>
+  <text x="700" y="385" fill="#fb7c5a" font-size="22" font-weight="700" text-anchor="middle">✕</text>
+  <text x="480" y="420" fill="#ffc9b8" font-size="15" text-anchor="middle">web erreicht die DB nicht</text>
+  <text x="480" y="440" fill="#ffc9b8" font-size="15" text-anchor="middle">(kein gemeinsames Netz)</text>
+
+  <!-- SSH -->
+  <text x="1115" y="474" fill="#8b93a1" font-size="13" text-anchor="middle" class="mono">127.0.0.1:5432 nur für SSH-Tunnel</text>
+</svg>
+</div>

@@ -1,0 +1,81 @@
+# Gesamte Maschinenverleih-Anwendung: Datenbank, Backend, Webserver/Reverse Proxy
+#
+#   Browser --> web (Caddy, Port 8080 bzw. 80) --/api--> backend (Spring Boot) --> postgres
+#
+# Start aus diesem Ordner:  docker compose up -d --build
+# Anleitung:                docs/anleitung_app_stack.md
+
+# Gleicher Projektname wie die Datenbank aus Story 10: Ein bereits laufender
+# Datenbank-Container wird uebernommen statt ein zweites Mal auf demselben Volume gestartet.
+name: maschinenverleih-db
+
+include:
+  # Datenbank unveraendert aus Story 10 (Passwort aus infra/postgres/.env)
+  - path: ../postgres/compose.yaml
+
+services:
+  backend:
+    build: ../../app/backend
+    image: maschinenverleih-backend:0.1.0
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/maschinenverleih
+      DB_USERNAME: maschinenverleih_app
+      DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD fehlt - in infra/stack/.env setzen (siehe .env.example)}
+      FRONTEND_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      # Nur fuer den allerersten Start setzen, danach wieder leeren
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - db-intern    # erreicht die Datenbank
+      - web-intern   # wird vom Webserver erreicht
+    # Kein "ports:": Das Backend ist nur ueber den Webserver erreichbar.
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web:
+    build: ../../app/frontend
+    image: maschinenverleih-web:0.1.0
+    restart: unless-stopped
+    ports:
+      # Lokal nur auf dem eigenen Rechner. Auf dem VPS in .env: WEB_BIND=0.0.0.0:80
+      - "${WEB_BIND:-127.0.0.1:8080}:80"
+    volumes:
+      - ../proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - web-intern   # nur Backend, KEIN Zugang zur Datenbank
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web-intern:
+    name: maschinenverleih-web-intern
+
+volumes:
+  caddy-data:
+    name: maschinenverleih-caddy-data
+  caddy-config:
+    name: maschinenverleih-caddy-config

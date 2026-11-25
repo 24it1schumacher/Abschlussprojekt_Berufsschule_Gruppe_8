@@ -8,9 +8,12 @@ Beispiel:
 import html, re, subprocess, sys, pathlib, tempfile
 
 SHOTS = pathlib.Path(sys.argv[1])
-OUT = pathlib.Path(sys.argv[2]); OUT.mkdir(parents=True, exist_ok=True)
+OUT = pathlib.Path(sys.argv[2]).resolve(); OUT.mkdir(parents=True, exist_ok=True)
 COMPOSE = pathlib.Path(sys.argv[3])
 TAG = sys.argv[4] if len(sys.argv) > 4 else ""
+# Optional: Zeilenbereiche fuer den Ausschnitt, z. B. "12-24,33-37"
+RANGES = [tuple(map(int, r.split("-"))) for r in sys.argv[5].split(",")] if len(sys.argv) > 5 else [(9, 43)]
+COMPOSE_TITLE = COMPOSE.resolve().relative_to(pathlib.Path(__file__).resolve().parents[2]).as_posix()
 TMP = pathlib.Path(tempfile.mkdtemp(prefix="nachweise_"))
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
 
@@ -43,6 +46,17 @@ META = {
         (r"22/tcp\s+open", "ok"), (r"5432/tcp\s+(filtered|closed)", "block"), (r":22 -> offen", "ok"), (r"keine Verbindung", "block")]),
     "13_ssh_tunnel": ("Zugriff nur über den SSH-Tunnel", [
         (r"keine Verbindung", "block"), (r"-> offen", "ok"), (r"Exit-Code: 0", "ok"), (r"17\.11", "ok")]),
+    # App-Stack
+    "21_build_mit_tests": ("Image-Bau führt die Backend-Tests aus", [
+        (r"Tests run: \d+, Failures: 0, Errors: 0", "ok"), (r"BUILD SUCCESS", "ok"), (r"Built", "ok")]),
+    "22_stack_laeuft": ("Drei Container, nur der Webserver nach außen", [
+        (r"^backend .*8080/tcp\s*$", "ok"), (r"^web .*127\.0\.0\.1:8080->80", "ok"), (r"^127\.0\.0\.1:8080$", "ok")]),
+    "23_proxy_routing": ("Ein Eingang: Webserver leitet /api an das Backend", [
+        (r'\{"status":"ok"\}', "ok"), (r"<title>", "ok"), (r"^(X-|Referrer|Permissions)", "ok")]),
+    "24_netztrennung": ("Netztrennung: Webserver erreicht die Datenbank nicht", [
+        (r'\{"status":"ok"\}', "ok"), (r"bad address", "block"), (r"Exit-Code: 1", "block"), (r"erreichbar", "ok"), (r"^maschinenverleih-(web|db)-intern:", "id")]),
+    "25_container_haertung": ("Container ohne Root und mit schreibgeschütztem Dateisystem", [
+        (r"uid=1000", "ok"), (r"Read-only file system", "block"), (r"Exit-Code: 1", "block"), (r"ReadOnly=true", "ok")]),
 }
 
 CSS = """
@@ -106,7 +120,7 @@ for txt in sorted(SHOTS.glob("*.txt")):
 
 # Compose-Datei mit Zeilennummern und markierten Kernzeilen
 src = COMPOSE.read_text(encoding="utf-8").rstrip("\n").split("\n")
-key = [r"image: postgres", r"POSTGRES_PASSWORD:", r'"127\.0\.0\.1:5432:5432"', r"postgres-data:/var", r"no-new-privileges", r"max-size", r"^  postgres-data:"]
+key = [r"include:", r"- path:", r"DB_URL:", r"- db-intern", r"- web-intern", r"WEB_BIND:-", r"Caddyfile:ro", r"read_only: true", r"image: postgres", r"POSTGRES_PASSWORD:", r'"127\.0\.0\.1:5432:5432"', r"postgres-data:/var", r"no-new-privileges", r"max-size", r"^  postgres-data:"]
 out = []
 for i, l in enumerate(src, 1):
     e = html.escape(l)
@@ -114,14 +128,14 @@ for i, l in enumerate(src, 1):
         e = f'<span class="cmt">{e}</span>'
     row = f'<span class="ln">{i}</span>{e}'
     out.append(f'<span class="ok">{row}</span>' if any(re.search(k, l) for k in key) else row + "\n")
-shoot("00_compose_yaml", page("infra/postgres/compose.yaml", "versioniert im Repository", "".join(out)), wrapped_lines(src, 110))
+shoot("00_compose_yaml", page(COMPOSE_TITLE, "versioniert im Repository", "".join(out)), wrapped_lines(src, 110))
 
 # Kompakter Ausschnitt fuer eine Folie: nur Zeilen ohne Kommentar, Zeilen 9-43
 out = []
 for i, l in enumerate(src, 1):
-    if not (9 <= i <= 43) or l.strip().startswith("#"):
+    if not any(a <= i <= b for a, b in RANGES) or l.strip().startswith("#"):
         continue
     e = html.escape(l.replace("POSTGRES_ADMIN_PASSWORD fehlt - in infra/postgres/.env setzen (siehe .env.example)", "Fehlermeldung"))
     row = f'<span class="ln">{i}</span>{e}'
     out.append(f'<span class="ok">{row}</span>' if any(re.search(k, l) for k in key) else row + "\n")
-shoot("00b_compose_ausschnitt", page("infra/postgres/compose.yaml (Ausschnitt, ohne Kommentare)", "versioniert im Repository", "".join(out)), len(out))
+shoot("00b_compose_ausschnitt", page(COMPOSE_TITLE + " (Ausschnitt, ohne Kommentare)", "versioniert im Repository", "".join(out)), len(out))

@@ -1,0 +1,10 @@
+[Unit]
+Description=Maschinenverleih: alle 2 Minuten auf neue Version pruefen
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=2min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

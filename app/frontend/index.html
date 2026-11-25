@@ -3,55 +3,135 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Maschinenverleih-Anwendung" />
-    <title>Maschinenverleih</title>
+    <meta name="description" content="Finde und miete die passende Maschine für dein nächstes Projekt." />
+    <meta name="theme-color" content="#153d35" />
+    <title>Maschinenverleih | Gruppe 8</title>
   </head>
   <body>
-    <main>
-      <h1>Maschinenverleih</h1>
-      <p id="api-status" role="status">Backend wird geprüft …</p>
+    <a class="skip-link" href="#maschinen">Zum Maschinenkatalog springen</a>
+    <div id="top" class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="#" aria-label="Maschinenverleih Gruppe 8 – Startseite">
+          <span class="brand-mark" aria-hidden="true">M</span>
+          <span class="brand-copy">
+            <strong>MASCHINENVERLEIH</strong>
+            <span>GRUPPE 8 · MIETPARK</span>
+          </span>
+        </a>
+        <nav class="main-nav" aria-label="Hauptnavigation">
+          <a href="#maschinen">Maschinen</a>
+          <a href="#mein-konto">Mein Konto</a>
+        </nav>
+        <div class="header-actions">
+          <p id="api-status" class="service-status" data-state="checking" role="status">Verbindung wird geprüft …</p>
+          <button id="logout-button" class="button button--quiet" type="button" hidden>Abmelden</button>
+        </div>
+      </header>
 
-      <section id="catalog-section" aria-labelledby="catalog-heading">
-        <h2 id="catalog-heading">Mietbare Maschinen</h2>
-        <p id="catalog-status" role="status">Maschinen werden geladen …</p>
-        <ul id="machine-list"></ul>
-      </section>
+      <main>
+        <section class="hero" aria-labelledby="hero-heading">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot"></span> Maschinen für dein Vorhaben</p>
+            <h1 id="hero-heading">Gutes Werkzeug.<br /><span>Gute Arbeit.</span></h1>
+            <p class="hero-description">
+              Finde die passende Maschine für dein nächstes Projekt – übersichtlich, zuverlässig und direkt aus unserem Mietpark.
+            </p>
+            <a class="button button--light" href="#maschinen">Mietpark entdecken <span aria-hidden="true">↓</span></a>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="hero-art__grid"></div>
+            <div class="hero-art__sun"></div>
+            <div class="hero-machine">
+              <span class="hero-machine__arm"></span>
+              <span class="hero-machine__cab"></span>
+              <span class="hero-machine__body"></span>
+              <span class="hero-machine__track"></span>
+              <span class="hero-machine__wheel hero-machine__wheel--left"></span>
+              <span class="hero-machine__wheel hero-machine__wheel--right"></span>
+            </div>
+            <span class="hero-art__caption">BEREIT FÜR DEIN PROJEKT</span>
+          </div>
+        </section>
 
-      <section id="login-section" aria-labelledby="login-heading">
-        <h2 id="login-heading">Anmelden</h2>
-        <form id="login-form">
-          <label for="login-email">E-Mail</label>
-          <input id="login-email" name="email" type="email" autocomplete="username" required />
-          <label for="login-password">Passwort</label>
-          <input id="login-password" name="password" type="password" autocomplete="current-password" required />
-          <button type="submit">Anmelden</button>
-        </form>
-        <p id="login-status" role="status"></p>
-      </section>
+        <div class="content-grid">
+          <section id="maschinen" class="panel catalog-panel" aria-labelledby="catalog-heading">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow eyebrow--dark">Unser Mietpark</p>
+                <h2 id="catalog-heading">Maschine finden</h2>
+                <p class="section-intro">Entdecke verfügbare Geräte und finde den passenden Helfer.</p>
+              </div>
+              <label class="search-field" for="machine-search">
+                <span class="sr-only">Maschinen suchen</span>
+                <span class="search-icon" aria-hidden="true"></span>
+                <input id="machine-search" type="search" placeholder="Name, Inventarnummer oder Ort" autocomplete="off" />
+              </label>
+            </div>
+            <p id="catalog-status" class="catalog-status" role="status">Maschinen werden geladen …</p>
+            <ul id="machine-list" class="machine-grid" aria-live="polite"></ul>
+          </section>
 
-      <section id="password-section" aria-labelledby="password-heading" hidden>
-        <h2 id="password-heading">Temporäres Passwort ändern</h2>
-        <form id="password-form">
-          <label for="current-password">Aktuelles Passwort</label>
-          <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required />
-          <label for="new-password">Neues Passwort (mindestens 12 Zeichen)</label>
-          <input id="new-password" name="newPassword" type="password" minlength="12" autocomplete="new-password" required />
-          <button type="submit">Passwort ändern</button>
-        </form>
-        <p id="password-status" role="status"></p>
-      </section>
+          <aside id="mein-konto" class="account-rail" aria-label="Benutzerbereich">
+            <section id="login-section" class="panel account-panel" aria-labelledby="login-heading">
+              <p class="eyebrow eyebrow--dark">Kundenbereich</p>
+              <h2 id="login-heading">Willkommen zurück</h2>
+              <p class="section-intro">Melde dich an, um deine Reservierungen und Aufträge einzusehen.</p>
+              <form id="login-form" class="form-stack">
+                <div class="field">
+                  <label for="login-email">E-Mail-Adresse</label>
+                  <input id="login-email" name="email" type="email" autocomplete="username" placeholder="name@beispiel.de" required />
+                </div>
+                <div class="field">
+                  <label for="login-password">Passwort</label>
+                  <input id="login-password" name="password" type="password" autocomplete="current-password" placeholder="Dein Passwort" required />
+                </div>
+                <button class="button button--primary button--full" type="submit">Anmelden <span aria-hidden="true">→</span></button>
+              </form>
+              <p id="login-status" class="form-status" role="status"></p>
+              <p class="account-note">Noch kein Zugang? Bitte wende dich an unser Team.</p>
+            </section>
 
-      <button id="logout-button" type="button" hidden>Abmelden</button>
+            <section id="password-section" class="panel account-panel" aria-labelledby="password-heading" hidden>
+              <p class="eyebrow eyebrow--dark">Kontosicherheit</p>
+              <h2 id="password-heading">Passwort festlegen</h2>
+              <p class="section-intro">Ändere dein temporäres Passwort, bevor du fortfährst.</p>
+              <form id="password-form" class="form-stack">
+                <div class="field">
+                  <label for="current-password">Aktuelles Passwort</label>
+                  <input id="current-password" name="currentPassword" type="password" autocomplete="current-password" required />
+                </div>
+                <div class="field">
+                  <label for="new-password">Neues Passwort</label>
+                  <input id="new-password" name="newPassword" type="password" minlength="12" autocomplete="new-password" aria-describedby="password-hint" required />
+                  <span id="password-hint" class="field-hint">Mindestens 12 Zeichen.</span>
+                </div>
+                <button class="button button--primary button--full" type="submit">Passwort ändern <span aria-hidden="true">→</span></button>
+              </form>
+              <p id="password-status" class="form-status" role="status"></p>
+            </section>
 
-      <section id="account-section" aria-labelledby="account-heading" hidden>
-        <h2 id="account-heading">Mein Bereich</h2>
-        <h3>Reservierungen</h3>
-        <ul id="reservation-list"></ul>
-        <h3>Aufträge</h3>
-        <ul id="rental-list"></ul>
-        <p id="account-status" role="status"></p>
-      </section>
-    </main>
+            <section id="account-section" class="panel account-panel" aria-labelledby="account-heading" hidden>
+              <p class="eyebrow eyebrow--dark">Dein Überblick</p>
+              <h2 id="account-heading">Mein Bereich</h2>
+              <div class="account-list-section">
+                <h3>Reservierungen</h3>
+                <ul id="reservation-list" class="record-list"></ul>
+              </div>
+              <div class="account-list-section">
+                <h3>Aufträge</h3>
+                <ul id="rental-list" class="record-list"></ul>
+              </div>
+              <p id="account-status" class="form-status" role="status"></p>
+            </section>
+          </aside>
+        </div>
+      </main>
+
+      <footer class="site-footer">
+        <span>Maschinenverleih · Gruppe 8</span>
+        <a href="#top">Zurück nach oben ↑</a>
+      </footer>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

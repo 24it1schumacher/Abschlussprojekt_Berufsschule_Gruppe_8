@@ -71,7 +71,16 @@ die erste Version aus und zeigt **einmalig** das Startpasswort des Admin-Kontos 
 - Geheimnisse nie ins Repository; sie liegen nur auf dem Server in `infra/postgres/.env` und `infra/stack/.env`.
 - Empfohlen (Einstellung nur durch den Repository-Besitzer): Branch Protection für `main` mit den drei Prüfungen als Pflicht.
 
-## 6. Grenzen
+## 6. Getestet (25.11.2026)
+
+| Test | Ergebnis |
+|---|---|
+| CI auf GitHub | Erster Lauf rot: shellcheck fand ein fehlendes `|| exit` nach `cd` in einem Skript. Nach der Korrektur alle drei Prüfungen grün. |
+| `auto-update.sh` echt unter Ubuntu 24.04 (WSL, Docker 29.1.3) | CI-Status über die GitHub-API gelesen, SQL 002–010 eingespielt und in `deploy_schema_history` mit Commit vermerkt, Images gebaut (Tests grün), Health-Check über den Webserver erfolgreich, Admin-Konto angelegt |
+| Zweiter Lauf ohne neuen Commit | Beendet sich sofort ohne Änderung |
+| Rollback | Noch nicht praktisch ausgelöst |
+
+## 7. Grenzen
 
 - SQL-Schritte werden beim Rollback nicht zurückgenommen; Datenbankänderungen müssen abwärtskompatibel sein.
 - Kein Backup vor dem Deployment (Story 25 / #26).

@@ -6,7 +6,8 @@
 #   sudo bash install.sh <admin-email> [branch] [hostname]
 #
 #   branch    Branch, dem der Server folgt (Standard: main)
-#   hostname  Name, unter dem die Anwendung per HTTPS erreichbar ist.
+#   hostname  Name(n), unter denen die Anwendung per HTTPS erreichbar ist, z. B. "bbk-it-08.de,www.bbk-it-08.de".
+#             Jeder Name braucht einen DNS-A-Record auf den Server.
 #             Standard: <server-ip-mit-bindestrichen>.sslip.io (zeigt per DNS auf die Server-IP,
 #             damit Let's Encrypt ohne eigene Domain ein Zertifikat ausstellen kann).
 #
@@ -24,7 +25,11 @@ set -euo pipefail
 ADMIN_EMAIL="${1:?Aufruf: sudo bash install.sh <admin-email> [branch] [hostname]}"
 BRANCH="${2:-main}"
 SERVER_IP="$(hostname -I | awk '{print $1}')"
-SITE="${3:-${SERVER_IP//./-}.sslip.io}"
+SITE_INPUT="${3:-${SERVER_IP//./-}.sslip.io}"
+# Mehrere Namen erlaubt ("bbk-it-08.de,www.bbk-it-08.de"); Caddy braucht "name1, name2"
+read -r -a SITE_NAMES <<< "${SITE_INPUT//,/ }"
+SITE_LIST="$(printf '%s, ' "${SITE_NAMES[@]}")"; SITE_LIST="${SITE_LIST%, }"
+SITE="${SITE_NAMES[0]}"   # Hauptname fuer Links und PUBLIC_ORIGIN
 REPO_URL="https://github.com/24it1schumacher/Abschlussprojekt_Berufsschule_Gruppe_8.git"
 DIR="/srv/maschinenverleih"
 SVC_USER="maschinenverleih-deploy"
@@ -70,7 +75,7 @@ if [ ! -f "$APP_ENV" ]; then
   set_kv "$APP_ENV" BOOTSTRAP_ADMIN_EMAIL "$ADMIN_EMAIL"
   set_kv "$APP_ENV" BOOTSTRAP_ADMIN_PASSWORD "Start-$(gen_pw | head -c 16)"
 fi
-set_kv "$APP_ENV" SITE_ADDRESS "$SITE"
+set_kv "$APP_ENV" SITE_ADDRESS "\"$SITE_LIST\""
 set_kv "$APP_ENV" PUBLIC_ORIGIN "https://$SITE"
 set_kv "$APP_ENV" WEB_BIND "0.0.0.0:80"
 set_kv "$APP_ENV" WEB_TLS_BIND "0.0.0.0:443"
